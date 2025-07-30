@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 Dashboard - Ma Che Serata</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-icon">🏠</span>
+                <span class="logo-text">Dashboard</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="flir2night.html" class="nav-link">Flir2night</a>
+                <a href="#eventi" class="nav-link">Eventi</a>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Content -->
+    <section class="dashboard-main">
+        <div class="container" style="padding-top: 120px;">
+            <div class="dashboard-welcome">
+                <h1>🏠 La Tua Dashboard Personale</h1>
+                <p>Benvenuto nella tua area riservata! Gestisci eventi, gruppi e scopri tutto quello che la notte ha da offrire.</p>
+                
+                <!-- User Stats -->
+                <div class="user-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎭</div>
+                        <div class="stat-info">
+                            <span class="stat-number">12</span>
+                            <span class="stat-label">Eventi Partecipati</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-info">
+                            <span class="stat-number">245</span>
+                            <span class="stat-label">Cheers Points</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <span class="stat-number">8</span>
+                            <span class="stat-label">Amici Incontrati</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-info">
+                            <span class="stat-number">4.8</span>
+                            <span class="stat-label">Rating Medio</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Cards -->
+                <div class="dashboard-cards">
+                    <div class="feature-card dashboard-card">
+                        <div class="feature-icon">🎭</div>
+                        <h3 class="feature-title">I Miei Eventi</h3>
+                        <p class="feature-description">
+                            Gestisci le tue prenotazioni e scopri eventi personalizzati per te
+                        </p>
+                        <div class="card-stats">
+                            <span>✅ 3 Prossimi</span>
+                            <span>📅 2 In Attesa</span>
+                        </div>
+                        <button class="btn-card-action">
+                            Vedi Eventi
+                        </button>
+                    </div>
+                    
+                    <div class="feature-card dashboard-card">
+                        <div class="feature-icon">❤️</div>
+                        <h3 class="feature-title">Eventi Salvati</h3>
+                        <p class="feature-description">
+                            La tua wishlist personale di eventi da non perdere
+                        </p>
+                        <div class="card-stats">
+                            <span>🔖 5 Salvati</span>
+                            <span>🔥 2 Hot</span>
+                        </div>
+                        <button class="btn-card-action">
+                            Sfoglia Salvati
+                        </button>
+                    </div>
+                    
+                    <div class="feature-card dashboard-card">
+                        <div class="feature-icon">👥</div>
+                        <h3 class="feature-title">Prenota Insieme</h3>
+                        <p class="feature-description">
+                            I tuoi gruppi attivi e richieste di "Prenota Insieme"
+                        </p>
+                        <div class="card-stats">
+                            <span>👫 2 Gruppi Attivi</span>
+                            <span>📨 1 Nuova Richiesta</span>
+                        </div>
+                        <button class="btn-card-action">
+                            Gestisci Gruppi
+                        </button>
+                    </div>
+                    
+                    <div class="feature-card dashboard-card">
+                        <div class="feature-icon">💬</div>
+                        <h3 class="feature-title">Flir2night</h3>
+                        <p class="feature-description">
+                            I tuoi post, commenti e attività nella community
+                        </p>
+                        <div class="card-stats">
+                            <span>✍️ 7 Post</span>
+                            <span>💖 156 Like Ricevuti</span>
+                        </div>
+                        <button class="btn-card-action" onclick="window.location.href='flir2night.html'">
+                            Vai al Forum
+                        </button>
+                    </div>
+                    
+                    <div class="feature-card dashboard-card">
+                        <div class="feature-icon">🎵</div>
+                        <h3 class="feature-title">Le Tue Playlist</h3>
+                        <p class="feature-description">
+                            Playlist create e quelle degli eventi che hai partecipato
+                        </p>
+                        <div class="card-stats">
+                            <span>🎧 4 Playlist</span>
+                            <span>🎶 89 Brani</span>
+                        </div>
+                        <button class="btn-card-action">
+                            Ascolta Musica
+                        </button>
+                    </div>
+                    
+                    <div class="feature-card dashboard-card">
+                        <div class="feature-icon">🏆</div>
+                        <h3 class="feature-title">Achievements</h3>
+                        <p class="feature-description">
+                            I tuoi badge, obiettivi raggiunti e prossime sfide
+                        </p>
+                        <div class="card-stats">
+                            <span>🏅 5 Badge</span>
+                            <span>🎯 2 Obiettivi Vicini</span>
+                        </div>
+                        <button class="btn-card-action">
+                            Vedi Badge
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-activity">
+                    <h2>📈 Attività Recente</h2>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <div class="activity-icon">🎭</div>
+                            <div class="activity-content">
+                                <span class="activity-text">Hai partecipato all'evento <strong>"Notte Magica al Duomo"</strong></span>
+                                <span class="activity-time">2 ore fa</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">💬</div>
+                            <div class="activity-content">
+                                <span class="activity-text">Hai pubblicato un post su <strong>Flir2night</strong></span>
+                                <span class="activity-time">1 giorno fa</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">👥</div>
+                            <div class="activity-content">
+                                <span class="activity-text">Ti sei unito al gruppo <strong>"Aperitivo Brera"</strong></span>
+                                <span class="activity-time">2 giorni fa</span>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon">🏆</div>
+                            <div class="activity-content">
+                                <span class="activity-text">Hai ottenuto il badge <strong>"Social Butterfly"</strong></span>
+                                <span class="activity-time">1 settimana fa</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions-section">
+                    <h2>⚡ Azioni Rapide</h2>
+                    <div class="quick-actions-grid">
+                        <button class="quick-action-btn" onclick="window.location.href='index.html#eventi'">
+                            <span class="quick-action-icon">🔍</span>
+                            <span class="quick-action-text">Cerca Eventi</span>
+                        </button>
+                        <button class="quick-action-btn" onclick="window.location.href='flir2night.html'">
+                            <span class="quick-action-icon">✍️</span>
+                            <span class="quick-action-text">Nuovo Post</span>
+                        </button>
+                        <button class="quick-action-btn">
+                            <span class="quick-action-icon">👥</span>
+                            <span class="quick-action-text">Trova Gruppo</span>
+                        </button>
+                        <button class="quick-action-btn">
+                            <span class="quick-action-icon">🎵</span>
+                            <span class="quick-action-text">Nuova Playlist</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <span class="toast-icon"></span>
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <style>
+        .dashboard-main {
+            min-height: 100vh;
+            background: var(--dark-bg);
+            padding: 40px 0;
+        }
+
+        .dashboard-welcome {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .dashboard-welcome h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: var(--accent-gradient);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+        }
+
+        .dashboard-welcome > p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 2rem;
+        }
+
+        .stat-info {
+            text-align: left;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .dashboard-card {
+            text-align: left;
+        }
+
+        .card-stats {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0 20px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-card-action {
+            padding: 12px 25px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .btn-card-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .recent-activity {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .recent-activity h2 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+        }
+
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .activity-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+        }
+
+        .activity-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .activity-text {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .activity-time {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .quick-actions-section {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: left;
+        }
+
+        .quick-actions-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+        }
+
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .quick-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .quick-action-btn:hover {
+            background: var(--primary-gradient);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .quick-action-icon {
+            font-size: 1.2rem;
+        }
+
+        .quick-action-text {
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-welcome h1 {
+                font-size: 2rem;
+            }
+
+            .user-stats {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 15px;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .card-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .quick-actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .activity-item {
+                padding: 12px;
+            }
+
+            .recent-activity,
+            .quick-actions-section {
+                padding: 20px;
+            }
+        }
+    </style>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
