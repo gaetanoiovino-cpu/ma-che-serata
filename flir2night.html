@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💬 Flir2night Community - Ma Che Serata</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="flir2night.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-icon">💬</span>
+                <span class="logo-text">Flir2night</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="#eventi" class="nav-link">Eventi</a>
+                <a href="#locali" class="nav-link">Locali</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <button class="btn-login" onclick="showLoginModal()">Accedi</button>
+                <button class="btn-register" onclick="showRegisterModal()">Registrati</button>
+            </div>
+            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Forum Hero Section -->
+    <section class="forum-hero">
+        <div class="hero-background"></div>
+        <div class="container">
+            <div class="forum-hero-content">
+                <h1 class="forum-title">
+                    <span class="gradient-text">Flir2night</span>
+                    <span class="hero-emoji">💬</span>
+                </h1>
+                <p class="forum-subtitle">
+                    La community dove la notte prende vita. Condividi, scopri, connetti.
+                </p>
+                <div class="forum-stats">
+                    <div class="forum-stat">
+                        <span class="stat-number">1.2K+</span>
+                        <span class="stat-label">Post Attivi</span>
+                    </div>
+                    <div class="forum-stat">
+                        <span class="stat-number">5.8K+</span>
+                        <span class="stat-label">Membri</span>
+                    </div>
+                    <div class="forum-stat">
+                        <span class="stat-number">89</span>
+                        <span class="stat-label">Online Ora</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Forum Content -->
+    <section class="forum-main">
+        <div class="container">
+            <div class="forum-layout">
+                <!-- Sidebar -->
+                <aside class="forum-sidebar">
+                    <!-- Categories -->
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">🔥 Categorie</h3>
+                        <div class="categories-list" id="categoriesContainer">
+                            <!-- Categories will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Top Contributors -->
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">🏆 Top Contributors</h3>
+                        <div class="contributors-list" id="topContributors">
+                            <!-- Contributors will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title">⚡ Quick Actions</h3>
+                        <div class="quick-actions">
+                            <button class="quick-action-btn" onclick="flir2night.showCreatePostModal()">
+                                ✍️ Nuovo Post
+                            </button>
+                            <button class="quick-action-btn" onclick="flir2night.filterByCategory('eventi')">
+                                🎭 Eventi Tonight
+                            </button>
+                            <button class="quick-action-btn" onclick="flir2night.filterByCategory('meetup')">
+                                👥 Trova Gruppo
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <main class="forum-content">
+                    <!-- Forum Header -->
+                    <div class="forum-header">
+                        <div class="forum-title-section">
+                            <h2>🌟 Feed Community</h2>
+                            <p>Scopri cosa sta succedendo nella notte italiana</p>
+                        </div>
+                        <button class="btn-create-post" id="createPostBtn">
+                            <span>✨</span>
+                            Condividi la tua serata
+                        </button>
+                    </div>
+
+                    <!-- Filters and Search -->
+                    <div class="forum-filters">
+                        <div class="search-section">
+                            <div class="search-bar">
+                                <input type="text" id="forumSearch" placeholder="🔍 Cerca post, utenti, tag...">
+                            </div>
+                        </div>
+                        <div class="filter-section">
+                            <select id="sortSelect" class="filter-select">
+                                <option value="recent">🕒 Più Recenti</option>
+                                <option value="popular">🔥 Più Popolari</option>
+                                <option value="discussed">💬 Più Discussi</option>
+                            </select>
+                            <select id="filterSelect" class="filter-select">
+                                <option value="all">Tutti i Post</option>
+                                <option value="eventi">🎭 Eventi</option>
+                                <option value="locali">🍸 Locali</option>
+                                <option value="musica">🎵 Musica</option>
+                                <option value="outfit">👗 Outfit</option>
+                                <option value="gossip">💬 Gossip</option>
+                                <option value="recensioni">⭐ Recensioni</option>
+                                <option value="meetup">👥 Meetup</option>
+                                <option value="deals">💰 Deals</option>
+                            </select>
+                            <div class="view-toggle">
+                                <button class="view-btn active" data-view="list" title="Vista Lista">📄</button>
+                                <button class="view-btn" data-view="grid" title="Vista Griglia">⚏</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Posts Container -->
+                    <div class="posts-container" id="postsContainer">
+                        <!-- Posts will be populated by JavaScript -->
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-container" id="pagination">
+                        <!-- Pagination will be populated by JavaScript -->
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <!-- Create Post Modal -->
+    <div class="modal" id="createPostModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✨ Condividi la tua serata</h2>
+                <button class="close-btn" onclick="flir2night.hideCreatePostModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="createPostForm">
+                    <div class="form-group">
+                        <label for="postTitle">Titolo del Post</label>
+                        <input type="text" id="postTitle" name="title" placeholder="Es: Serata incredibile al Duomo Bar!" required maxlength="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="postCategory">Categoria</label>
+                        <select id="postCategory" name="category" required>
+                            <option value="">Seleziona una categoria</option>
+                            <option value="eventi">🎭 Eventi</option>
+                            <option value="locali">🍸 Locali</option>
+                            <option value="musica">🎵 Musica</option>
+                            <option value="outfit">👗 Outfit</option>
+                            <option value="gossip">💬 Gossip</option>
+                            <option value="recensioni">⭐ Recensioni</option>
+                            <option value="meetup">👥 Meetup</option>
+                            <option value="deals">💰 Deals</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="postContent">Racconta la tua esperienza</label>
+                        <textarea id="postContent" name="content" placeholder="Condividi dettagli, emozioni, foto, consigli... La community vuole sapere tutto!" required rows="6" maxlength="1000"></textarea>
+                        <small class="char-counter">0/1000 caratteri</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="postTags">Tag (separati da virgola)</label>
+                        <input type="text" id="postTags" name="tags" placeholder="Es: duomo, cocktail, milano, nightlife" maxlength="200">
+                        <small>Aiuta gli altri a trovare il tuo post con tag pertinenti</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="file-upload-label">
+                            📷 Aggiungi Foto (opzionale)
+                            <input type="file" accept="image/*" multiple style="display: none;">
+                            <span class="file-upload-text">Trascina le foto qui o clicca per selezionare</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="flir2night.hideCreatePostModal()">
+                            Annulla
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            🚀 Pubblica Post
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal (reused from main site) -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🍸 Accedi al tuo account</h2>
+                <button class="close-btn" onclick="hideLoginModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" name="email" placeholder="La tua email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <div class="password-input-group">
+                            <input type="password" id="loginPassword" name="password" placeholder="La tua password" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility(event)">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <a href="#" class="forgot-password" onclick="showForgotPasswordModal()">Password dimenticata?</a>
+                    </div>
+                    <div class="error-message" id="loginError"></div>
+                    <button type="submit" class="btn-primary" id="loginBtn">Accedi</button>
+                </form>
+                <div class="modal-footer">
+                    <p>Non hai un account? <a href="#" onclick="hideLoginModal(); showRegisterModal();">Registrati qui</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal (reused from main site) -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🚀 Unisciti alla community</h2>
+                <button class="close-btn" onclick="hideRegisterModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" name="username" placeholder="Il tuo username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" name="email" placeholder="La tua email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <div class="password-input-group">
+                            <input type="password" id="registerPassword" name="password" placeholder="Crea una password" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility(event)">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Conferma Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Ripeti la password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Che tipo di utente sei?</label>
+                        <select id="role" name="role" required>
+                            <option value="">Seleziona il tuo ruolo</option>
+                            <option value="matcher">🎭 Matcher - Voglio partecipare agli eventi</option>
+                            <option value="pr">📢 PR - Promuovo eventi e locali</option>
+                            <option value="venue">🍸 Locale - Gestisco un locale/venue</option>
+                            <option value="artist">🎵 Artista - Sono un DJ/performer</option>
+                        </select>
+                    </div>
+                    <div class="form-group instagram-field" style="display: none;">
+                        <label for="instagram">Instagram Handle</label>
+                        <input type="text" id="instagram" name="instagram" placeholder="@tuousername">
+                        <small>Richiesto per verifica identità (PR, Venue, Artisti)</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="acceptTerms" required>
+                            <span class="checkmark"></span>
+                            Accetto i <a href="#" target="_blank">Termini di Servizio</a> e la <a href="#" target="_blank">Privacy Policy</a>
+                        </label>
+                    </div>
+                    <div class="error-message" id="registerError"></div>
+                    <button type="submit" class="btn-primary" id="registerBtn">Registrati</button>
+                </form>
+                <div class="modal-footer">
+                    <p>Hai già un account? <a href="#" onclick="hideRegisterModal(); showLoginModal();">Accedi qui</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <span class="toast-icon"></span>
+            <span class="toast-message"></span>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/flir2night.js"></script>
+</body>
+</html>
