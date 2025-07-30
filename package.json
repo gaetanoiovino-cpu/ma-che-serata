@@ -1,0 +1,38 @@
+{
+    "name": "ma-che-serata",
+  "version": "1.0.0",
+  "description": "🍸 Ma Che Serata - Nightlife & Events Platform",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'Static site - no build required'",
+    "start": "netlify dev"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.7",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.10.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "nightlife",
+    "events",
+    "community",
+    "booking",
+    "milan",
+    "nodejs",
+    "netlify"
+  ],
+  "author": "Ma Che Serata Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gaetanoiovino-cpu/ma-che-serata.git"
+  }
+}
