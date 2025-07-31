@@ -1434,3 +1434,37 @@ section {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Fix per Safari iOS - Safe Area */
+@media screen and (max-width: 768px) {
+    body {
+        padding-top: env(safe-area-inset-top, 0px) !important;
+    }
+    
+    .navbar {
+        position: fixed !important;
+        top: env(safe-area-inset-top, 0px) !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9999 !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(10px) !important;
+    }
+    
+    /* Rimuovi barre strane */
+    *::-webkit-search-decoration,
+    *::-webkit-search-cancel-button,
+    *::-webkit-search-results-button,
+    *::-webkit-search-results-decoration {
+        display: none !important;
+    }
+    
+    /* Fix per input che sembrano search bar */
+    input[type="search"],
+    input[type="text"],
+    input[type="email"] {
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        border-radius: 0 !important;
+    }
+}
