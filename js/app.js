@@ -528,3 +528,20 @@ function togglePasswordVisibility(event) {
         button.textContent = '👁️';
     }
 }
+// Fix iOS touch events
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+    if (mobileToggle) {
+        // Aggiungi event listener per touch (iOS)
+        mobileToggle.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            toggleMobileMenu();
+        });
+        
+        // Mantieni anche click per desktop
+        mobileToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleMobileMenu();
+        });
+    }
+});
