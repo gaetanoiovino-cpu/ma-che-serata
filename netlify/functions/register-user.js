@@ -27,10 +27,6 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        if (!event.body) {
-            throw new Error('No data provided');
-        }
-
         const { username, email, password, role, instagram } = JSON.parse(event.body);
         
         if (!username || !email || !password || !role) {
@@ -40,9 +36,9 @@ exports.handler = async (event, context) => {
         // Hash password
         const passwordHash = await bcrypt.hash(password, 10);
         
-        // Insert user - USING CORRECT COLUMN NAMES
+        // Insert user - NOMI COLONNE CORRETTI
         const result = await pool.query(
-            'INSERT INTO users (username, email, password, role, status, instagram, reputatior, created_a, updated_a) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW()) RETURNING id, username, email, role, status',
+            'INSERT INTO users (username, email, password_hash, role, status, instagram_handle, reputation, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW()) RETURNING username, email, role, status',
             [username, email, passwordHash, role, 'active', instagram || null, 0]
         );
         
@@ -54,25 +50,17 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({
                 success: true,
                 message: 'Registrazione completata con successo!',
-                user: {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    role: user.role,
-                    status: user.status
-                }
+                user: user
             })
         };
         
     } catch (error) {
-        console.error('Registration error:', error);
-        
         return {
             statusCode: 500,
             headers,
             body: JSON.stringify({
                 success: false,
-                message: `Errore durante la registrazione: ${error.message}`
+                message: error.message
             })
         };
     }
