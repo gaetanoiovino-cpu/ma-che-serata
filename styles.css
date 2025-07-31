@@ -1434,31 +1434,3 @@ section {
         transition-duration: 0.01ms !important;
     }
 }
-
-/* Fix iPhone - Rimuovi barra strana */
-@media screen and (max-width: 768px) {
-    /* Rimuovi elementi di ricerca iOS */
-    *::-webkit-search-decoration,
-    *::-webkit-search-cancel-button,
-    *::-webkit-search-results-button,
-    *::-webkit-search-results-decoration {
-        display: none !important;
-    }
-    
-    /* Fix input iOS */
-    input {
-        -webkit-appearance: none !important;
-        appearance: none !important;
-    }
-    
-    /* Assicura che il menu mobile funzioni */
-    .mobile-menu-toggle {
-        display: block !important;
-        z-index: 10000 !important;
-        pointer-events: auto !important;
-    }
-    
-    .nav-links {
-        z-index: 9999 !important;
-    }
-}
