@@ -15,13 +15,13 @@ exports.handler = async (event, context) => {
         const { username, email, password, role, instagram } = JSON.parse(event.body);
         
         if (!username || !email || !password || !role) {
-            throw new Error('Missing required fields');
+            throw new Error('Campi obbligatori mancanti');
         }
 
-        // Initialize Supabase
+        // Initialize Supabase with SERVICE ROLE (per scrivere nel database)
         const supabase = createClient(
             process.env.SUPABASE_URL,
-            process.env.SUPABASE_ANON_KEY
+            process.env.SUPABASE_SERVICE_ROLE
         );
 
         // Hash password
@@ -37,14 +37,13 @@ exports.handler = async (event, context) => {
                 role,
                 status: 'active',
                 instagram_handle: instagram || null,
-                reputation: 0,
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
+                reputation: 0
             }])
-            .select('username, email, role, status');
+            .select('username, email, role, status')
+            .single();
 
         if (error) {
-            throw new Error(`Database error: ${error.message}`);
+            throw new Error(`Errore database: ${error.message}`);
         }
 
         return {
@@ -52,8 +51,8 @@ exports.handler = async (event, context) => {
             headers,
             body: JSON.stringify({
                 success: true,
-                message: 'Registrazione completata con successo!',
-                user: data[0]
+                message: 'Registrazione completata con successo! 🎉',
+                user: data
             })
         };
 
