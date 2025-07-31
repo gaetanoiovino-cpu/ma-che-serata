@@ -1460,3 +1460,32 @@ section {
         appearance: none !important;
     }
 }
+/* Fix barra che copre navbar su iOS */
+@media screen and (max-width: 768px) {
+    body {
+        padding-top: env(safe-area-inset-top, 20px) !important;
+    }
+    
+    .navbar {
+        top: env(safe-area-inset-top, 0px) !important;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+    }
+    
+    /* Fix elementi search iOS */
+    input {
+        -webkit-appearance: none !important;
+        appearance: none !important;
+    }
+    
+    *::-webkit-search-decoration,
+    *::-webkit-search-cancel-button,
+    *::-webkit-search-results-button {
+        display: none !important;
+    }
+    
+    /* Assicura che nulla copra la navbar */
+    .navbar {
+        z-index: 10000 !important;
+    }
+}
