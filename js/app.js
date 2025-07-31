@@ -521,3 +521,17 @@ document.addEventListener('DOMContentLoaded', () => {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = MaCheSerata;
 }
+
+// Password visibility toggle
+function togglePasswordVisibility(event) {
+    const button = event.target;
+    const input = button.parentNode.querySelector('input');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        button.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        button.textContent = '👁️';
+    }
+}
