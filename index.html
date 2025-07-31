@@ -260,47 +260,62 @@
         </div>
     </div>
 
-    <!-- Register Modal -->
-    <div id="registerModal" class="modal">
+        <!-- Register Modal (reused from main site) -->
+    <div class="modal" id="registerModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>✨ Registrati</h2>
-                <span class="close" onclick="hideRegisterModal()">&times;</span>
+                <h2>🚀 Unisciti alla community</h2>
+                <button class="close-btn" onclick="hideRegisterModal()">&times;</button>
             </div>
-            <form id="registerForm" class="auth-form">
-                <div class="form-group">
-                    <label for="registerUsername">Username</label>
-                    <input type="text" id="registerUsername" name="username" required>
+            <div class="modal-body">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" name="username" placeholder="Il tuo username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" name="email" placeholder="La tua email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <div class="password-input-group">
+                            <input type="password" id="registerPassword" name="password" placeholder="Crea una password" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility(event)">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Conferma Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Ripeti la password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Che tipo di utente sei?</label>
+                        <select id="role" name="role" required>
+                            <option value="">Seleziona il tuo ruolo</option>
+                            <option value="matcher">🎭 Matcher - Voglio partecipare agli eventi</option>
+                            <option value="pr">📢 PR - Promuovo eventi e locali</option>
+                            <option value="venue">🍸 Locale - Gestisco un locale/venue</option>
+                            <option value="artist">🎵 Artista - Sono un DJ/performer</option>
+                        </select>
+                    </div>
+                    <div class="form-group instagram-field" style="display: none;">
+                        <label for="instagram">Instagram Handle</label>
+                        <input type="text" id="instagram" name="instagram" placeholder="@tuousername">
+                        <small>Richiesto per verifica identità (PR, Venue, Artisti)</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="acceptTerms" required>
+                            <span class="checkmark"></span>
+                            Accetto i <a href="#" target="_blank">Termini di Servizio</a> e la <a href="#" target="_blank">Privacy Policy</a>
+                        </label>
+                    </div>
+                    <div class="error-message" id="registerError"></div>
+                    <button type="submit" class="btn-primary" id="registerBtn">Registrati</button>
+                </form>
+                <div class="modal-footer">
+                    <p>Hai già un account? <a href="#" onclick="hideRegisterModal(); showLoginModal();">Accedi qui</a></p>
                 </div>
-                <div class="form-group">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerPassword">Password</label>
-                    <input type="password" id="registerPassword" name="password" required>
-                    <div class="password-strength" id="passwordStrength"></div>
-                </div>
-                <div class="form-group">
-                    <label for="registerRole">Ruolo</label>
-                    <select id="registerRole" name="role" required>
-                        <option value="matcher">🎭 Matcher (Standard User)</option>
-                        <option value="pr">🌟 PR (StagePass)</option>
-                        <option value="venue">🏢 Venue (Spotlight)</option>
-                        <option value="artist">🎵 Artist (Performer)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="registerInstagram">Instagram Handle (opzionale)</label>
-                    <input type="text" id="registerInstagram" name="instagram" placeholder="@username">
-                </div>
-                <button type="submit" class="btn-primary btn-full" id="registerBtn">
-                    <span class="btn-text">Registrati</span>
-                    <span class="btn-loader" style="display: none;">🔄</span>
-                </button>
-            </form>
-            <div class="auth-footer">
-                <p>Hai già un account? <a href="#" onclick="switchToLogin()">Accedi</a></p>
             </div>
         </div>
     </div>
