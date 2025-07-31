@@ -31,7 +31,7 @@ exports.handler = async (event, context) => {
             throw new Error('No data provided');
         }
 
-        const { username, email, password, role } = JSON.parse(event.body);
+        const { username, email, password, role, instagram } = JSON.parse(event.body);
         
         if (!username || !email || !password || !role) {
             throw new Error('Missing required fields');
@@ -40,10 +40,10 @@ exports.handler = async (event, context) => {
         // Hash password
         const passwordHash = await bcrypt.hash(password, 10);
         
-        // Insert user
+        // Insert user - USING CORRECT COLUMN NAMES
         const result = await pool.query(
-            'INSERT INTO users (username, email, password_hash, role, status, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id, username, email, role, status',
-            [username, email, passwordHash, role, 'active']
+            'INSERT INTO users (username, email, password, role, status, instagram, reputatior, created_a, updated_a) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW()) RETURNING id, username, email, role, status',
+            [username, email, passwordHash, role, 'active', instagram || null, 0]
         );
         
         const user = result.rows[0];
@@ -72,8 +72,7 @@ exports.handler = async (event, context) => {
             headers,
             body: JSON.stringify({
                 success: false,
-                message: `Errore: ${error.message}`,
-                details: error.toString()
+                message: `Errore durante la registrazione: ${error.message}`
             })
         };
     }
