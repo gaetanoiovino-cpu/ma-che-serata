@@ -101,6 +101,9 @@ class AuthManager {
         if (!this.validateRegisterForm(userData)) {
             return;
         }
+        // Remove confirmPassword before sending to backend
+delete userData.confirmPassword;
+delete userData.acceptTerms;
 
         this.setLoadingState(true, 'registerBtn');
 
