@@ -1460,24 +1460,20 @@ section {
         appearance: none !important;
     }
 }
-/* TEST CSS - aggiungi temporaneamente */
-@media (max-width: 768px) {
-    .mobile-menu-toggle {
-        background: red !important;
-        padding: 20px !important;
-        border: 2px solid white !important;
-        position: relative !important;
-        z-index: 99999 !important;
+// Fix iOS touch events
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileToggle = document.querySelector('.mobile-menu-toggle');
+    if (mobileToggle) {
+        // Aggiungi event listener per touch (iOS)
+        mobileToggle.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            toggleMobileMenu();
+        });
+        
+        // Mantieni anche click per desktop
+        mobileToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleMobileMenu();
+        });
     }
-    
-    .nav-container.mobile-menu-open .nav-links {
-        background: blue !important;
-        display: flex !important;
-        position: fixed !important;
-        top: 80px !important;
-        left: 0 !important;
-        right: 0 !important;
-        height: 300px !important;
-        z-index: 9999 !important;
-    }
-}
+});
