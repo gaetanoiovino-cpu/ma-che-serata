@@ -385,28 +385,21 @@ class MaCheSerata {
         }
     }
 
-    // Toast Notifications
-    showToast(message, type = 'info') {
-        const toast = document.getElementById('toast');
-        const toastIcon = toast.querySelector('.toast-icon');
-        const toastMessage = toast.querySelector('.toast-message');
-
-        const icons = {
-            success: '✅',
-            error: '❌',
-            warning: '⚠️',
-            info: 'ℹ️'
-        };
-
-        toastIcon.textContent = icons[type] || icons.info;
-        toastMessage.textContent = message;
-        
-        toast.className = `toast show ${type}`;
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 4000);
+  // Toast Notifications
+showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    if (!toast) {
+        alert(message); // Fallback se toast non esiste
+        return;
     }
+    
+    toast.textContent = message;
+    toast.className = `toast ${type} show`;
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
 
     // API Helper
     async apiCall(endpoint, options = {}) {
