@@ -574,7 +574,32 @@ renderPostCard(post) {
                 content: formData.get('content'),
                 category: formData.get('category'),
                 tags: formData.get('tags').split(',').map(tag => tag.trim()).filter(tag => tag),
-                images: [], // Temporaneamente vuoto
+// Handle image uploads prima di creare postData
+let imageUrls = [];
+const fileInput = form.querySelector('input[type="file"]');
+
+if (fileInput && fileInput.files.length > 0) {
+    for (let i = 0; i < fileInput.files.length; i++) {
+        const file = fileInput.files[i];
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const uploadResponse = await fetch('/api/upload-image', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (uploadResponse.ok) {
+            const uploadData = await uploadResponse.json();
+            if (uploadData.success) {
+                imageUrls.push(uploadData.url);
+            }
+        }
+    }
+}
+
+// Poi usa imageUrls invece di array vuoto
+images: imageUrls,
                 author_id: window.app.user.id,
                 author_username: window.app.user.username,
                 likes: 0,
