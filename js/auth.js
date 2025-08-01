@@ -39,10 +39,10 @@ class AuthManager {
             input.addEventListener('input', (e) => this.checkPasswordStrength(e.target));
         });
 
-        // Role selection in registration
-        const roleSelect = document.getElementById('role');
-        if (roleSelect) {
-            roleSelect.addEventListener('change', (e) => this.handleRoleChange(e));
+        // User type selection in registration
+        const userTypeSelect = document.getElementById('userType');
+        if (userTypeSelect) {
+            userTypeSelect.addEventListener('change', (e) => this.handleUserTypeChange(e));
         }
     }
 
@@ -101,9 +101,32 @@ class AuthManager {
         if (!this.validateRegisterForm(userData)) {
             return;
         }
-        // Remove confirmPassword before sending to backend
-delete userData.confirmPassword;
-delete userData.acceptTerms;
+        // Prepare professional info object
+        const professionalInfo = {};
+        if (userData.businessName) professionalInfo.business_name = userData.businessName;
+        if (userData.businessDescription) professionalInfo.business_description = userData.businessDescription;
+        if (userData.businessAddress) professionalInfo.business_address = userData.businessAddress;
+        if (userData.businessPhone) professionalInfo.business_phone = userData.businessPhone;
+        if (userData.businessWebsite) professionalInfo.business_website = userData.businessWebsite;
+
+        // Prepare final user data
+        const finalUserData = {
+            username: userData.username,
+            email: userData.email,
+            password: userData.password,
+            user_type: userData.userType,
+            instagram: userData.instagram,
+            professional_info: Object.keys(professionalInfo).length > 0 ? professionalInfo : null
+        };
+
+        // Remove form-only fields
+        delete userData.confirmPassword;
+        delete userData.acceptTerms;
+        delete userData.businessName;
+        delete userData.businessDescription;
+        delete userData.businessAddress;
+        delete userData.businessPhone;
+        delete userData.businessWebsite;
 
         this.setLoadingState(true, 'registerBtn');
 
@@ -113,7 +136,7 @@ delete userData.acceptTerms;
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(userData)
+                body: JSON.stringify(finalUserData)
             });
 
             const data = await response.json();
@@ -188,9 +211,9 @@ delete userData.acceptTerms;
             isValid = false;
         }
 
-        // Role validation
-        if (!userData.role) {
-            errors.push('Seleziona un ruolo');
+        // User type validation
+        if (!userData.userType) {
+            errors.push('Seleziona un tipo di account');
             isValid = false;
         }
 
@@ -200,10 +223,21 @@ delete userData.acceptTerms;
             isValid = false;
         }
 
-        // Instagram validation for specific roles
-        if (['pr', 'artist', 'venue'].includes(userData.role) && !userData.instagram) {
-            errors.push('Instagram richiesto per questo ruolo');
-            isValid = false;
+        // Professional fields validation
+        const isProfessional = userData.userType && userData.userType !== 'matcher';
+        if (isProfessional) {
+            if (!userData.instagram) {
+                errors.push('Instagram richiesto per account professionali');
+                isValid = false;
+            }
+            if (!userData.businessName) {
+                errors.push('Nome attività richiesto per account professionali');
+                isValid = false;
+            }
+            if (!userData.businessDescription) {
+                errors.push('Descrizione attività richiesta per account professionali');
+                isValid = false;
+            }
         }
 
         if (!isValid) {
@@ -342,29 +376,70 @@ delete userData.acceptTerms;
         }
     }
 
-    handleRoleChange(e) {
-        const role = e.target.value;
+    handleUserTypeChange(e) {
+        const userType = e.target.value;
         const instagramField = document.querySelector('.instagram-field');
         const instagramInput = document.querySelector('input[name="instagram"]');
+        const professionalInfo = document.getElementById('professionalInfo');
+        const accountTypeInfo = document.getElementById('accountTypeInfo');
+        const trialNotice = document.getElementById('trialNotice');
         
         if (!instagramField || !instagramInput) return;
 
-        // Show Instagram field for specific roles
-        if (['pr', 'artist', 'venue'].includes(role)) {
+        const isProfessional = userType && userType !== 'matcher';
+        
+        // Show/hide professional fields
+        if (isProfessional) {
             instagramField.style.display = 'block';
             instagramInput.required = true;
+            professionalInfo.style.display = 'block';
+            trialNotice.style.display = 'block';
             
-            // Update placeholder based on role
-            const placeholders = {
-                pr: '@nomePR - per verifica identità',
-                artist: '@nomeArtista - per verifica profilo',
-                venue: '@nomeLocale - per verifica attività'
-            };
-            instagramInput.placeholder = placeholders[role] || '@username';
+            // Show account type specific info
+            let infoText = '';
+            let placeholder = '';
+            switch(userType) {
+                case 'pr':
+                    infoText = 'Come PR avrai accesso a strumenti di promozione eventi e statistiche avanzate.';
+                    placeholder = '@nomePR - per verifica identità';
+                    break;
+                case 'manager':
+                    infoText = 'Come gestore locale potrai pubblicare eventi e gestire prenotazioni.';
+                    placeholder = '@nomeLocale - per verifica attività';
+                    break;
+                case 'artist':
+                    infoText = 'Come artista potrai promuovere i tuoi eventi e collegarti con locali e PR.';
+                    placeholder = '@nomeArtista - per verifica profilo';
+                    break;
+            }
+            accountTypeInfo.textContent = infoText;
+            accountTypeInfo.style.display = 'block';
+            instagramInput.placeholder = placeholder;
+            
+            // Make business fields required for professionals
+            const businessName = document.getElementById('businessName');
+            const businessDescription = document.getElementById('businessDescription');
+            if (businessName) businessName.required = true;
+            if (businessDescription) businessDescription.required = true;
         } else {
             instagramField.style.display = 'none';
             instagramInput.required = false;
             instagramInput.value = '';
+            professionalInfo.style.display = 'none';
+            trialNotice.style.display = 'none';
+            
+            // Remove required from business fields
+            const businessName = document.getElementById('businessName');
+            const businessDescription = document.getElementById('businessDescription');
+            if (businessName) businessName.required = false;
+            if (businessDescription) businessDescription.required = false;
+            
+            if (userType === 'matcher') {
+                accountTypeInfo.textContent = 'Come Matcher avrai accesso immediato alla piattaforma per partecipare agli eventi!';
+                accountTypeInfo.style.display = 'block';
+            } else {
+                accountTypeInfo.style.display = 'none';
+            }
         }
     }
 

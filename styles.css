@@ -1536,3 +1536,42 @@ section {
 .footer a:hover {
     color: rgba(255, 255, 255, 0.8) !important;
 }
+
+/* Trial Notice */
+.trial-notice {
+    background: linear-gradient(135deg, rgba(254, 202, 87, 0.1), rgba(255, 107, 107, 0.1));
+    border: 1px solid rgba(254, 202, 87, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.trial-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.trial-text {
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.trial-text strong {
+    color: #feca57;
+}
+
+/* Professional Info Section */
+#professionalInfo {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+}
+
+#professionalInfo .form-group:last-child {
+    margin-bottom: 0;
+}

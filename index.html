@@ -290,19 +290,53 @@
     <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Ripeti la password" required>
 </div>
                     <div class="form-group">
-                        <label for="role">Che tipo di utente sei?</label>
-                        <select id="role" name="role" required>
+                        <label for="userType">Che tipo di utente sei?</label>
+                        <select id="userType" name="userType" required>
                             <option value="">Seleziona il tuo ruolo</option>
-                            <option value="matcher">🎭 Matcher - Voglio partecipare agli eventi</option>
-                            <option value="pr">📢 PR - Promuovo eventi e locali</option>
-                            <option value="venue">🍸 Locale - Gestisco un locale/venue</option>
-                            <option value="artist">🎵 Artista - Sono un DJ/performer</option>
+                            <option value="matcher">🎭 Matcher - Voglio partecipare agli eventi (Accesso immediato)</option>
+                            <option value="pr">📢 PR/Promoter - Promuovo eventi e locali (Validazione richiesta)</option>
+                            <option value="manager">🍸 Gestore Locale - Gestisco un locale/venue (Validazione richiesta)</option>
+                            <option value="artist">🎵 Artista - Sono un DJ/performer (Validazione richiesta)</option>
                         </select>
+                        <small id="accountTypeInfo" style="display: none; color: #feca57;"></small>
                     </div>
+                    
+                    <!-- Professional Info Section -->
+                    <div id="professionalInfo" style="display: none;">
+                        <div class="form-group">
+                            <label for="businessName">Nome Attività/Brand</label>
+                            <input type="text" id="businessName" name="businessName" placeholder="Es: Disco XYZ, DJ Mario Rossi">
+                        </div>
+                        <div class="form-group">
+                            <label for="businessDescription">Descrizione Attività</label>
+                            <textarea id="businessDescription" name="businessDescription" rows="3" placeholder="Descrivi brevemente la tua attività..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="businessAddress">Indirizzo (per locali)</label>
+                            <input type="text" id="businessAddress" name="businessAddress" placeholder="Via, Città">
+                        </div>
+                        <div class="form-group">
+                            <label for="businessPhone">Telefono Aziendale</label>
+                            <input type="tel" id="businessPhone" name="businessPhone" placeholder="+39 XXX XXX XXXX">
+                        </div>
+                        <div class="form-group">
+                            <label for="businessWebsite">Sito Web/Social</label>
+                            <input type="url" id="businessWebsite" name="businessWebsite" placeholder="https://...">
+                        </div>
+                    </div>
+                    
                     <div class="form-group instagram-field" style="display: none;">
                         <label for="instagram">Instagram Handle</label>
                         <input type="text" id="instagram" name="instagram" placeholder="@tuousername">
-                        <small>Richiesto per verifica identità (PR, Venue, Artisti)</small>
+                        <small>Richiesto per verifica identità (Professionisti)</small>
+                    </div>
+                    
+                    <div id="trialNotice" style="display: none;" class="trial-notice">
+                        <div class="trial-icon">⏰</div>
+                        <div class="trial-text">
+                            <strong>Periodo di Prova</strong><br>
+                            Avrai 48 ore per testare la piattaforma gratuitamente. Dopo questo periodo, dovrai attendere la validazione dell'admin per continuare ad utilizzare tutti i servizi.
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="checkbox-label">
