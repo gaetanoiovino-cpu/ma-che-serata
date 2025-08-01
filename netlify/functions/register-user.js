@@ -12,14 +12,23 @@ exports.handler = async (event, context) => {
     }
 
     try {
+        console.log('Registration request received:', event.body);
+        
         const { 
             username, email, password, user_type, instagram,
             professional_info, business_name, business_type, business_address,
             business_phone, business_website, business_description
         } = JSON.parse(event.body);
         
+        console.log('Parsed registration data:', { username, email, user_type, instagram });
+        
         if (!username || !email || !password || !user_type) {
-            throw new Error('Username, email, password e tipo account sono obbligatori');
+            const missingFields = [];
+            if (!username) missingFields.push('username');
+            if (!email) missingFields.push('email');
+            if (!password) missingFields.push('password');
+            if (!user_type) missingFields.push('user_type');
+            throw new Error(`Campi obbligatori mancanti: ${missingFields.join(', ')}`);
         }
 
         // Initialize Supabase with SERVICE ROLE (per scrivere nel database)

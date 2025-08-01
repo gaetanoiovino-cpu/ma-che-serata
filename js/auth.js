@@ -97,6 +97,9 @@ class AuthManager {
         const formData = new FormData(form);
         const userData = Object.fromEntries(formData.entries());
 
+        // Debug: Log form data
+        console.log('Form data received:', userData);
+
         // Client-side validation
         if (!this.validateRegisterForm(userData)) {
             return;
@@ -115,9 +118,11 @@ class AuthManager {
             email: userData.email,
             password: userData.password,
             user_type: userData.userType,
-            instagram: userData.instagram,
+            instagram: userData.instagram || null,
             professional_info: Object.keys(professionalInfo).length > 0 ? professionalInfo : null
         };
+        
+        console.log('Final user data being sent:', finalUserData);
 
         // Remove form-only fields
         delete userData.confirmPassword;
@@ -180,6 +185,8 @@ class AuthManager {
     validateRegisterForm(userData) {
         let isValid = true;
         const errors = [];
+        
+        console.log('Validating user data:', userData);
 
         // Username validation
         if (!userData.username || userData.username.length < 3) {
@@ -212,13 +219,14 @@ class AuthManager {
         }
 
         // User type validation
-        if (!userData.userType) {
+        if (!userData.userType || userData.userType === '') {
             errors.push('Seleziona un tipo di account');
             isValid = false;
         }
 
-        // Terms validation
-        if (!userData.acceptTerms) {
+        // Terms validation - checkbox non spuntati non appaiono in FormData
+        const acceptTermsCheckbox = document.getElementById('acceptTerms');
+        if (!acceptTermsCheckbox || !acceptTermsCheckbox.checked) {
             errors.push('Devi accettare i termini e condizioni');
             isValid = false;
         }
@@ -241,6 +249,7 @@ class AuthManager {
         }
 
         if (!isValid) {
+            console.log('Validation errors:', errors);
             this.showError('registerError', errors.join('<br>'));
         }
 
