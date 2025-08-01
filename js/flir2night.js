@@ -458,3 +458,187 @@ renderPostCard(post) {
         postsContainer.innerHTML = postsHTML;
         postsContainer.className = `posts-container ${this.currentView}`;
     }
+    // Post interactions
+    toggleLike(postId) {
+        if (!window.app || !window.app.user) {
+            window.app.showToast('Effettua il login per mettere like', 'warning');
+            showLoginModal();
+            return;
+        }
+
+        const post = this.posts.find(p => p.id === postId);
+        if (!post) return;
+
+        post.isLiked = !post.isLiked;
+        post.likes += post.isLiked ? 1 : -1;
+
+        // Update UI
+        const likeBtn = document.querySelector(`[data-post-id="${postId}"] .like-btn`);
+        const likeCount = document.querySelector(`[data-post-id="${postId}"] .stat-item:nth-child(2) .stat-number`);
+        
+        if (likeBtn) {
+            likeBtn.classList.toggle('liked', post.isLiked);
+        }
+        if (likeCount) {
+            likeCount.textContent = post.likes;
+        }
+
+        window.app.showToast(post.isLiked ? 'Like aggiunto!' : 'Like rimosso', 'success');
+    }
+
+    toggleSave(postId) {
+        if (!window.app || !window.app.user) {
+            window.app.showToast('Effettua il login per salvare post', 'warning');
+            showLoginModal();
+            return;
+        }
+
+        const post = this.posts.find(p => p.id === postId);
+        if (!post) return;
+
+        post.isSaved = !post.isSaved;
+
+        // Update UI
+        const saveBtn = document.querySelector(`[data-post-id="${postId}"] .save-btn`);
+        if (saveBtn) {
+            saveBtn.classList.toggle('saved', post.isSaved);
+        }
+
+        window.app.showToast(post.isSaved ? 'Post salvato!' : 'Post rimosso dai salvati', 'success');
+    }
+
+    sharePost(postId) {
+        const post = this.posts.find(p => p.id === postId);
+        if (!post) return;
+
+        const shareData = {
+            title: post.title,
+            text: post.content,
+            url: `${window.location.href}#post-${postId}`
+        };
+
+        if (navigator.share) {
+            navigator.share(shareData);
+        } else {
+            // Fallback - copy to clipboard
+            const shareText = `${post.title}\n\n${post.content}\n\n${shareData.url}`;
+            navigator.clipboard.writeText(shareText).then(() => {
+                window.app.showToast('Link copiato negli appunti!', 'success');
+            });
+        }
+    }
+
+    showComments(postId) {
+        window.app.showToast('Sezione commenti disponibile prossimamente', 'info');
+    }
+
+    showCreatePostModal() {
+        if (!window.app || !window.app.user) {
+            window.app.showToast('Effettua il login per creare post', 'warning');
+            showLoginModal();
+            return;
+        }
+
+        const modal = document.getElementById('createPostModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    hideCreatePostModal() {
+        const modal = document.getElementById('createPostModal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+
+    async handleCreatePost(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        
+        // Show loading
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = '🔄 Caricamento...';
+        submitBtn.disabled = true;
+        
+        try {
+            // Per ora, salviamo il post SENZA immagini per evitare problemi CORS
+            // Le immagini verranno aggiunte in una versione futura
+            const postData = {
+                title: formData.get('title'),
+                content: formData.get('content'),
+                category: formData.get('category'),
+                tags: formData.get('tags').split(',').map(tag => tag.trim()).filter(tag => tag),
+                images: [], // Temporaneamente vuoto
+                author_id: window.app.user.id,
+                author_username: window.app.user.username,
+                likes: 0,
+                comments: 0,
+                views: 0
+            };
+
+            // Salva il post via Netlify Functions
+            const saveResponse = await fetch('/api/forum-posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            });
+
+            if (!saveResponse.ok) {
+                const errorText = await saveResponse.text();
+                throw new Error(`HTTP ${saveResponse.status}: ${errorText}`);
+            }
+
+            const saveData = await saveResponse.json();
+
+            if (!saveData.success) {
+                throw new Error(saveData.error || 'Unknown error');
+            }
+
+            const savedPost = saveData.post;
+            
+            // Aggiungi il nuovo post alla lista locale
+            const newPost = {
+                id: savedPost.id,
+                title: savedPost.title,
+                content: savedPost.content,
+                category: savedPost.category,
+                tags: savedPost.tags || [],
+                images: savedPost.images || [],
+                author: {
+                    username: savedPost.author_username,
+                    avatar: this.getAuthorAvatar(savedPost.author_username),
+                    reputation: window.app.user.reputation || 0,
+                    badge: this.getAuthorBadge(savedPost.author_username)
+                },
+                timestamp: new Date(savedPost.created_at),
+                likes: 0,
+                comments: 0,
+                views: 0,
+                isLiked: false,
+                isSaved: false
+            };
+
+            this.posts.unshift(newPost);
+            this.renderPosts();
+            this.hideCreatePostModal();
+            form.reset();
+            
+            window.app.showToast('Post creato con successo!', 'success');
+            
+        } catch (error) {
+            console.error('Error creating post:', error);
+            window.app.showToast(`Errore: ${error.message}`, 'error');
+        } finally {
+            // Reset button
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    }
