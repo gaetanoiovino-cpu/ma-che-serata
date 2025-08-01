@@ -567,39 +567,81 @@ getAuthorBadge(username) {
     submitBtn.disabled = true;
     
     try {
-        let imageUrls = [];
-        
-        // Handle image uploads
-        const fileInput = form.querySelector('input[type="file"]');
-        if (fileInput && fileInput.files.length > 0) {
-            // Initialize Supabase client
-            const { createClient } = window.supabase;
-            const supabase = createClient(
-                'https://zroxlktebmblzjqerdvb.supabase.co',
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpyb3hsa3RlYm1ibHpqcWVyZHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NzA2ODYsImV4cCI6MjA2OTQ0NjY4Nn0.kAhZQpq9114CX9RyzEV1OPE0bXF5fTw5vwkEPu1eLH4'
-            );
-            
-            for (let i = 0; i < fileInput.files.length; i++) {
-                const file = fileInput.files[i];
-                const fileName = `${Date.now()}-${i}-${file.name}`;
-                
-                const { data, error } = await supabase.storage
-                    .from('post-images')
-                    .upload(fileName, file);
-                
-                if (error) {
-                    console.error('Upload error:', error);
-                    continue;
-                }
-                
-                // Get public URL
-                const { data: { publicUrl } } = supabase.storage
-                    .from('post-images')
-                    .getPublicUrl(fileName);
-                
-                imageUrls.push(publicUrl);
-            }
+        // Per ora, salviamo il post SENZA immagini per evitare problemi CORS
+        // Le immagini verranno aggiunte in una versione futura
+        const postData = {
+            title: formData.get('title'),
+            content: formData.get('content'),
+            category: formData.get('category'),
+            tags: formData.get('tags').split(',').map(tag => tag.trim()).filter(tag => tag),
+            images: [], // Temporaneamente vuoto
+            author_id: window.app.user.id,
+            author_username: window.app.user.username,
+            likes: 0,
+            comments: 0,
+            views: 0
+        };
+
+        // Salva il post via Netlify Functions
+        const saveResponse = await fetch('/api/forum-posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        });
+
+        if (!saveResponse.ok) {
+            const errorText = await saveResponse.text();
+            throw new Error(`HTTP ${saveResponse.status}: ${errorText}`);
         }
+
+        const saveData = await saveResponse.json();
+
+        if (!saveData.success) {
+            throw new Error(saveData.error || 'Unknown error');
+        }
+
+        const savedPost = saveData.post;
+        
+        // Aggiungi il nuovo post alla lista locale
+        const newPost = {
+            id: savedPost.id,
+            title: savedPost.title,
+            content: savedPost.content,
+            category: savedPost.category,
+            tags: savedPost.tags || [],
+            images: savedPost.images || [],
+            author: {
+                username: savedPost.author_username,
+                avatar: this.getAuthorAvatar(savedPost.author_username),
+                reputation: window.app.user.reputation || 0,
+                badge: this.getAuthorBadge(savedPost.author_username)
+            },
+            timestamp: new Date(savedPost.created_at),
+            likes: 0,
+            comments: 0,
+            views: 0,
+            isLiked: false,
+            isSaved: false
+        };
+
+        this.posts.unshift(newPost);
+        this.renderPosts();
+        this.hideCreatePostModal();
+        form.reset();
+        
+        window.app.showToast('Post creato con successo!', 'success');
+        
+    } catch (error) {
+        console.error('Error creating post:', error);
+        window.app.showToast(`Errore: ${error.message}`, 'error');
+    } finally {
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+}
  // Salva il post nel database via Netlify Functions
 const postData = {
     title: formData.get('title'),
