@@ -93,31 +93,28 @@ class Flir2nightForum {
         ];
 
         // Carica i post dal database
-await this.loadPostsFromDatabase();
-    }
 async loadPostsFromDatabase() {
     try {
-        // Initialize Supabase client
-        const { createClient } = window.supabase;
-        const supabase = createClient(
-            'https://zroxlktebmblzjqerdvb.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpyb3hsa3RlYm1ibHpqcWVyZHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NzA2ODYsImV4cCI6MjA2OTQ0NjY4Nn0.kAhZQpq9114CX9RyzEV1OPE0bXF5fTw5vwkEPu1eLH4'
-        );
+        // Usa Netlify Functions invece di chiamate dirette a Supabase
+        const response = await fetch('/api/forum-posts', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-        // Load posts from database
-        const { data: posts, error } = await supabase
-            .from('forum_posts')
-            .select('*')
-            .order('created_at', { ascending: false });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-        if (error) {
-            console.error('Error loading posts:', error);
-            this.posts = [];
-            return;
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to load posts');
         }
 
         // Convert database posts to frontend format
-        this.posts = posts.map(post => ({
+        this.posts = data.posts.map(post => ({
             id: post.id,
             title: post.title,
             content: post.content,
@@ -138,9 +135,16 @@ async loadPostsFromDatabase() {
             isSaved: false
         }));
 
+        console.log('Posts loaded successfully:', this.posts.length);
+
     } catch (error) {
-        console.error('Database connection error:', error);
+        console.error('Error loading posts:', error);
         this.posts = [];
+        
+        // Mostra errore all'utente
+        if (window.app && window.app.showToast) {
+            window.app.showToast('Errore nel caricamento dei post', 'error');
+        }
     }
 }
 
