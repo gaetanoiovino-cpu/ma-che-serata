@@ -604,11 +604,52 @@ class Flir2nightForum {
         }
     }
 
-    handleCreatePost(e) {
-        e.preventDefault();
+    async handleCreatePost(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    
+    // Show loading
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '🔄 Caricamento...';
+    submitBtn.disabled = true;
+    
+    try {
+        let imageUrls = [];
         
-        const form = e.target;
-        const formData = new FormData(form);
+        // Handle image uploads
+        const fileInput = form.querySelector('input[type="file"]');
+        if (fileInput && fileInput.files.length > 0) {
+            // Initialize Supabase client
+            const { createClient } = window.supabase;
+            const supabase = createClient(
+                'https://zroxlktebmblzjqerdvb.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpyb3hsa3RlYm1ibHpqcWVyZHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NzA2ODYsImV4cCI6MjA2OTQ0NjY4Nn0.kAhZQpq9114CX9RyzEV1OPE0bXF5fTw5vwkEPu1eLH4'
+            );
+            
+            for (let i = 0; i < fileInput.files.length; i++) {
+                const file = fileInput.files[i];
+                const fileName = `${Date.now()}-${i}-${file.name}`;
+                
+                const { data, error } = await supabase.storage
+                    .from('post-images')
+                    .upload(fileName, file);
+                
+                if (error) {
+                    console.error('Upload error:', error);
+                    continue;
+                }
+                
+                // Get public URL
+                const { data: { publicUrl } } = supabase.storage
+                    .from('post-images')
+                    .getPublicUrl(fileName);
+                
+                imageUrls.push(publicUrl);
+            }
+        }
         
         const newPost = {
             id: this.posts.length + 1,
@@ -616,6 +657,7 @@ class Flir2nightForum {
             content: formData.get('content'),
             category: formData.get('category'),
             tags: formData.get('tags').split(',').map(tag => tag.trim()).filter(tag => tag),
+            images: imageUrls, // Foto uploadate
             author: {
                 username: window.app.user.username,
                 avatar: window.app.user.avatar || '👤',
@@ -636,8 +678,16 @@ class Flir2nightForum {
         form.reset();
         
         window.app.showToast('Post creato con successo!', 'success');
+        
+    } catch (error) {
+        console.error('Error creating post:', error);
+        window.app.showToast('Errore durante la creazione del post', 'error');
+    } finally {
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
     }
-
+}
     // Utility methods
     formatTimeAgo(timestamp) {
         const now = new Date();
