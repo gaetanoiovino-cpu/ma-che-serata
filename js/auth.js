@@ -97,9 +97,6 @@ class AuthManager {
         const formData = new FormData(form);
         const userData = Object.fromEntries(formData.entries());
 
-        // Debug: Log form data
-        console.log('Form data received:', userData);
-
         // Client-side validation
         if (!this.validateRegisterForm(userData)) {
             return;
@@ -121,8 +118,6 @@ class AuthManager {
             instagram: userData.instagram || null,
             professional_info: Object.keys(professionalInfo).length > 0 ? professionalInfo : null
         };
-        
-        console.log('Final user data being sent:', finalUserData);
 
         // Remove form-only fields
         delete userData.confirmPassword;
@@ -185,8 +180,6 @@ class AuthManager {
     validateRegisterForm(userData) {
         let isValid = true;
         const errors = [];
-        
-        console.log('Validating user data:', userData);
 
         // Username validation
         if (!userData.username || userData.username.length < 3) {
@@ -249,7 +242,6 @@ class AuthManager {
         }
 
         if (!isValid) {
-            console.log('Validation errors:', errors);
             this.showError('registerError', errors.join('<br>'));
         }
 

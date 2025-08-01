@@ -12,15 +12,11 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        console.log('Registration request received:', event.body);
-        
         const { 
             username, email, password, user_type, instagram,
             professional_info, business_name, business_type, business_address,
             business_phone, business_website, business_description
         } = JSON.parse(event.body);
-        
-        console.log('Parsed registration data:', { username, email, user_type, instagram });
         
         if (!username || !email || !password || !user_type) {
             const missingFields = [];

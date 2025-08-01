@@ -545,3 +545,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Switch functions for modal transitions
+function switchToRegister() {
+    hideLoginModal();
+    setTimeout(() => {
+        showRegisterModal();
+    }, 300);
+}
+
+function switchToLogin() {
+    hideRegisterModal();
+    setTimeout(() => {
+        showLoginModal();
+    }, 300);
+}
