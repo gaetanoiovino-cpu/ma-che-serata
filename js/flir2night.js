@@ -626,25 +626,25 @@ if (dbError) {
     return;
 }
         const newPost = {
-            id: this.posts.length + 1,
-            title: formData.get('title'),
-            content: formData.get('content'),
-            category: formData.get('category'),
-            tags: formData.get('tags').split(',').map(tag => tag.trim()).filter(tag => tag),
-            images: imageUrls, // Foto uploadate
-            author: {
-                username: window.app.user.username,
-                avatar: window.app.user.avatar || '👤',
-                reputation: window.app.user.reputation || 0,
-                badge: window.app.user.badge || 'New Member'
-            },
-            timestamp: new Date(),
-            likes: 0,
-            comments: 0,
-            views: 0,
-            isLiked: false,
-            isSaved: false
-        };
+    id: savedPost.id,
+    title: savedPost.title,
+    content: savedPost.content,
+    category: savedPost.category,
+    tags: savedPost.tags || [],
+    images: savedPost.images || [],
+    author: {
+        username: savedPost.author_username,
+        avatar: this.getAuthorAvatar(savedPost.author_username),
+        reputation: window.app.user.reputation || 0,
+        badge: this.getAuthorBadge(savedPost.author_username)
+    },
+    timestamp: new Date(savedPost.created_at),
+    likes: 0,
+    comments: 0,
+    views: 0,
+    isLiked: false,
+    isSaved: false
+};
 
         this.posts.unshift(newPost);
         this.renderPosts();
