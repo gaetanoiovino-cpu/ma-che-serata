@@ -95,7 +95,69 @@ class Flir2nightForum {
         // Carica i post dal database
 await this.loadPostsFromDatabase();
     }
+async loadPostsFromDatabase() {
+    try {
+        // Initialize Supabase client
+        const { createClient } = window.supabase;
+        const supabase = createClient(
+            'https://zroxlktebmblzjqerdvb.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpyb3hsa3RlYm1ibHpqcWVyZHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NzA2ODYsImV4cCI6MjA2OTQ0NjY4Nn0.kAhZQpq9114CX9RyzEV1OPE0bXF5fTw5vwkEPu1eLH4'
+        );
 
+        // Load posts from database
+        const { data: posts, error } = await supabase
+            .from('forum_posts')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error loading posts:', error);
+            this.posts = [];
+            return;
+        }
+
+        // Convert database posts to frontend format
+        this.posts = posts.map(post => ({
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            category: post.category,
+            tags: post.tags || [],
+            images: post.images || [],
+            author: {
+                username: post.author_username,
+                avatar: this.getAuthorAvatar(post.author_username),
+                reputation: 0,
+                badge: this.getAuthorBadge(post.author_username)
+            },
+            timestamp: new Date(post.created_at),
+            likes: post.likes || 0,
+            comments: post.comments || 0,
+            views: post.views || 0,
+            isLiked: false,
+            isSaved: false
+        }));
+
+    } catch (error) {
+        console.error('Database connection error:', error);
+        this.posts = [];
+    }
+}
+
+getAuthorAvatar(username) {
+    const avatars = ['🌟', '💕', '🎧', '👑', '✨', '🎭', '🔥', '💎', '🌙', '⭐'];
+    const index = username.length % avatars.length;
+    return avatars[index];
+}
+
+getAuthorBadge(username) {
+    if (username.includes('PR') || username.includes('Official')) return 'Verified PR';
+    if (username.includes('DJ') || username.includes('Beat')) return 'Music Expert';
+    if (username.includes('Queen') || username.includes('King')) return 'Gold Matcher';
+    if (username.includes('Review')) return 'Review Master';
+    if (username.includes('Fashion') || username.includes('Style')) return 'Style Guru';
+    return 'Community Member';
+}
     renderCategories() {
         const categoriesContainer = document.getElementById('categoriesContainer');
         if (!categoriesContainer) return;
