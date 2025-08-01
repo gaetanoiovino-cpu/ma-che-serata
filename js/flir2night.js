@@ -273,3 +273,188 @@ async loadPostsFromDatabase() {
         // Render pagination
         this.renderPagination(filteredPosts.length);
     }
+renderPostCard(post) {
+        const timeAgo = this.formatTimeAgo(post.timestamp);
+        const isLikedClass = post.isLiked ? 'liked' : '';
+        const isSavedClass = post.isSaved ? 'saved' : '';
+        const pinnedBadge = post.isPinned ? '<span class="pinned-badge">📌 Fissato</span>' : '';
+
+        const imagesHTML = post.images ? 
+            `<div class="post-images">
+                ${post.images.map(img => `<img src="${img}" alt="Post image" loading="lazy">`).join('')}
+            </div>` : '';
+
+        return `
+            <article class="post-card ${this.currentView}" data-post-id="${post.id}">
+                ${pinnedBadge}
+                <div class="post-header">
+                    <div class="post-author">
+                        <div class="author-avatar">${post.author.avatar}</div>
+                        <div class="author-info">
+                            <div class="author-username">${post.author.username}</div>
+                            <div class="author-meta">
+                                <span class="author-badge">${post.author.badge}</span>
+                                <span class="post-time">${timeAgo}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-category">
+                        <span class="category-tag">${this.getCategoryIcon(post.category)} ${this.getCategoryName(post.category)}</span>
+                    </div>
+                </div>
+
+                <div class="post-content">
+                    <h3 class="post-title">${post.title}</h3>
+                    <p class="post-text">${post.content}</p>
+                    ${imagesHTML}
+                    <div class="post-tags">
+                        ${post.tags.map(tag => `<span class="post-tag">#${tag}</span>`).join('')}
+                    </div>
+                </div>
+
+                <div class="post-stats">
+                    <span class="stat-item">
+                        <span class="stat-icon">👁️</span>
+                        <span class="stat-number">${post.views}</span>
+                    </span>
+                    <span class="stat-item">
+                        <span class="stat-icon">❤️</span>
+                        <span class="stat-number">${post.likes}</span>
+                    </span>
+                    <span class="stat-item">
+                        <span class="stat-icon">💬</span>
+                        <span class="stat-number">${post.comments}</span>
+                    </span>
+                </div>
+
+                <div class="post-actions">
+                    <button class="post-action-btn like-btn ${isLikedClass}" onclick="flir2night.toggleLike(${post.id})">
+                        <span class="action-icon">❤️</span>
+                        <span class="action-text">Like</span>
+                    </button>
+                    <button class="post-action-btn comment-btn" onclick="flir2night.showComments(${post.id})">
+                        <span class="action-icon">💬</span>
+                        <span class="action-text">Commenta</span>
+                    </button>
+                    <button class="post-action-btn share-btn" onclick="flir2night.sharePost(${post.id})">
+                        <span class="action-icon">📤</span>
+                        <span class="action-text">Condividi</span>
+                    </button>
+                    <button class="post-action-btn save-btn ${isSavedClass}" onclick="flir2night.toggleSave(${post.id})">
+                        <span class="action-icon">🔖</span>
+                        <span class="action-text">Salva</span>
+                    </button>
+                </div>
+            </article>
+        `;
+    }
+
+    renderPagination(totalPosts) {
+        const paginationContainer = document.getElementById('pagination');
+        if (!paginationContainer) return;
+
+        const totalPages = Math.ceil(totalPosts / this.postsPerPage);
+        
+        if (totalPages <= 1) {
+            paginationContainer.innerHTML = '';
+            return;
+        }
+
+        let paginationHTML = '';
+        
+        // Previous button
+        if (this.currentPage > 1) {
+            paginationHTML += `<button class="pagination-btn" onclick="flir2night.goToPage(${this.currentPage - 1})">‹ Precedente</button>`;
+        }
+
+        // Page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === this.currentPage) {
+                paginationHTML += `<button class="pagination-btn active">${i}</button>`;
+            } else if (i === 1 || i === totalPages || (i >= this.currentPage - 1 && i <= this.currentPage + 1)) {
+                paginationHTML += `<button class="pagination-btn" onclick="flir2night.goToPage(${i})">${i}</button>`;
+            } else if (i === this.currentPage - 2 || i === this.currentPage + 2) {
+                paginationHTML += `<span class="pagination-dots">...</span>`;
+            }
+        }
+
+        // Next button
+        if (this.currentPage < totalPages) {
+            paginationHTML += `<button class="pagination-btn" onclick="flir2night.goToPage(${this.currentPage + 1})">Successiva ›</button>`;
+        }
+
+        paginationContainer.innerHTML = `<div class="pagination-wrapper">${paginationHTML}</div>`;
+    }
+
+    // Event handlers
+    filterByCategory(category) {
+        this.currentFilter = category;
+        this.currentPage = 1;
+
+        // Update active category button
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-category="${category}"]`).classList.add('active');
+
+        this.renderPosts();
+    }
+
+    toggleView(view) {
+        this.currentView = view;
+
+        // Update active view button
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-view="${view}"]`).classList.add('active');
+
+        this.renderPosts();
+    }
+
+    goToPage(page) {
+        this.currentPage = page;
+        this.renderPosts();
+        
+        // Scroll to top of posts
+        document.getElementById('postsContainer').scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    }
+
+    searchPosts(query) {
+        if (!query.trim()) {
+            this.renderPosts();
+            return;
+        }
+
+        const filteredPosts = this.posts.filter(post => 
+            post.title.toLowerCase().includes(query.toLowerCase()) ||
+            post.content.toLowerCase().includes(query.toLowerCase()) ||
+            post.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase())) ||
+            post.author.username.toLowerCase().includes(query.toLowerCase())
+        );
+
+        this.renderFilteredPosts(filteredPosts);
+    }
+
+    renderFilteredPosts(posts) {
+        const postsContainer = document.getElementById('postsContainer');
+        if (!postsContainer) return;
+
+        if (posts.length === 0) {
+            postsContainer.innerHTML = `
+                <div class="no-posts">
+                    <div class="no-posts-icon">🔍</div>
+                    <h3>Nessun risultato trovato</h3>
+                    <p>Prova con parole chiave diverse</p>
+                </div>
+            `;
+            return;
+        }
+
+        const postsHTML = posts.map(post => this.renderPostCard(post)).join('');
+        postsContainer.innerHTML = postsHTML;
+        postsContainer.className = `posts-container ${this.currentView}`;
+    }
