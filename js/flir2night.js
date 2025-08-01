@@ -80,7 +80,7 @@ class Flir2nightForum {
         }
     }
 
-    loadMockData() {
+    async loadMockData() {
         this.categories = [
             { id: 'eventi', name: 'Eventi', icon: '🎭', count: 45 },
             { id: 'locali', name: 'Locali', icon: '🍸', count: 32 },
