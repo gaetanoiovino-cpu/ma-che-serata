@@ -596,7 +596,35 @@ getAuthorBadge(username) {
                 imageUrls.push(publicUrl);
             }
         }
-        
+        // Salva il post nel database
+const { createClient } = window.supabase;
+const supabase = createClient(
+    'https://zroxlktebmblzjqerdvb.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpyb3hsa3RlYm1ibHpqcWVyZHZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4NzA2ODYsImV4cCI6MjA2OTQ0NjY4Nn0.kAhZQpq9114CX9RyzEV1OPE0bXF5fTw5vwkEPu1eLH4'
+);
+
+const { data: savedPost, error: dbError } = await supabase
+    .from('forum_posts')
+    .insert([{
+        title: formData.get('title'),
+        content: formData.get('content'),
+        category: formData.get('category'),
+        tags: formData.get('tags').split(',').map(tag => tag.trim()).filter(tag => tag),
+        images: imageUrls,
+        author_id: window.app.user.id,
+        author_username: window.app.user.username,
+        likes: 0,
+        comments: 0,
+        views: 0
+    }])
+    .select()
+    .single();
+
+if (dbError) {
+    console.error('Database save error:', dbError);
+    window.app.showToast('Errore nel salvare il post', 'error');
+    return;
+}
         const newPost = {
             id: this.posts.length + 1,
             title: formData.get('title'),
