@@ -1518,3 +1518,21 @@ section {
         z-index: 10000 !important;
     }
 }
+/* Fix footer links - da azzurri a bianchi */
+.footer-column a {
+    color: #ffffff !important; /* Bianco invece di azzurro */
+}
+
+.footer-column a:hover {
+    color: rgba(255, 255, 255, 0.8) !important; /* Bianco trasparente al hover */
+}
+
+.footer-social a,
+.footer a {
+    color: #ffffff !important;
+}
+
+.footer-social a:hover,
+.footer a:hover {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
