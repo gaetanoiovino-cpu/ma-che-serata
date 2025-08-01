@@ -642,3 +642,48 @@ renderPostCard(post) {
             submitBtn.disabled = false;
         }
     }
+    // Utility methods
+    formatTimeAgo(timestamp) {
+        const now = new Date();
+        const diff = now - timestamp;
+        
+        const minutes = Math.floor(diff / (1000 * 60));
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        
+        if (minutes < 60) {
+            return `${minutes}m fa`;
+        } else if (hours < 24) {
+            return `${hours}h fa`;
+        } else {
+            return `${days}g fa`;
+        }
+    }
+
+    getCategoryIcon(categoryId) {
+        const category = this.categories.find(c => c.id === categoryId);
+        return category ? category.icon : '📝';
+    }
+
+    getCategoryName(categoryId) {
+        const category = this.categories.find(c => c.id === categoryId);
+        return category ? category.name : 'Generale';
+    }
+}
+
+// Close create post modal when clicking outside
+document.addEventListener('click', (e) => {
+    if (e.target.id === 'createPostModal') {
+        window.flir2night.hideCreatePostModal();
+    }
+});
+
+// Initialize Flir2night forum
+document.addEventListener('DOMContentLoaded', () => {
+    window.flir2night = new Flir2nightForum();
+});
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = Flir2nightForum;
+}
