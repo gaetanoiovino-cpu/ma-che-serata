@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StagePass Dashboard - Ma Che Serata</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .pr-dashboard {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 30px;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+        }
+
+        .stagepass-level {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .level-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .events-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .event-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .event-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .invite-generator {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            background: white;
+            border-radius: 10px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 12px;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-gradient:hover {
+            transform: scale(1.05);
+        }
+
+        .vibes-track {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .vibes-meter {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .vibes-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pr-dashboard {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="index.html">🎭 Ma Che Serata</a>
+            </div>
+            <div class="nav-links">
+                <a href="flir2night.html">Flir2night</a>
+                <a href="pr-dashboard.html" class="active">StagePass</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pr-dashboard">
+        <!-- Header con StagePass Level -->
+        <div class="dashboard-header">
+            <div class="stagepass-level">
+                <div class="level-badge">
+                    <h3>🎯 StagePass Level 3</h3>
+                    <p>Top Host · 2,450 punti</p>
+                </div>
+                <div>
+                    <h2 id="welcomeMessage">Ciao Marco! 🎉</h2>
+                    <p>Hai 3 eventi attivi e 127 invitati confermati</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Eventi Promossi -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-calendar-star"></i>
+                    </div>
+                    <div>
+                        <h3>Eventi Promossi</h3>
+                        <p>Gestisci e monitora i tuoi eventi</p>
+                    </div>
+                </div>
+                <div class="events-list" id="promotedEvents">
+                    <div class="event-item">
+                        <h4>🎵 Saturday Night Fever</h4>
+                        <p>Sabato 15 Gen · Discoteca XYZ</p>
+                        <div class="event-stats">
+                            <div class="stat-item">
+                                <strong>156</strong>
+                                <small>Visualizzazioni</small>
+                            </div>
+                            <div class="stat-item">
+                                <strong>23</strong>
+                                <small>Click</small>
+                            </div>
+                            <div class="stat-item">
+                                <strong>12</strong>
+                                <small>Check-in</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="event-item">
+                        <h4>🎤 Live Session</h4>
+                        <p>Venerdì 21 Gen · Club Elite</p>
+                        <div class="event-stats">
+                            <div class="stat-item">
+                                <strong>89</strong>
+                                <small>Visualizzazioni</small>
+                            </div>
+                            <div class="stat-item">
+                                <strong>15</strong>
+                                <small>Click</small>
+                            </div>
+                            <div class="stat-item">
+                                <strong>8</strong>
+                                <small>Check-in</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-gradient" onclick="createNewEvent()">
+                    <i class="fas fa-plus"></i> Crea Nuovo Evento
+                </button>
+            </div>
+
+            <!-- Lista Invitati -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <h3>Lista Invitati</h3>
+                        <p>Gestisci ospiti e inviti</p>
+                    </div>
+                </div>
+                <div id="guestList">
+                    <div style="text-align: center; margin: 20px 0;">
+                        <p>👥 <strong>127 invitati confermati</strong></p>
+                        <p>⏳ 23 in attesa di risposta</p>
+                        <p>📧 156 inviti inviati totali</p>
+                    </div>
+                    <button class="btn-gradient" onclick="manageGuestList()">
+                        <i class="fas fa-edit"></i> Gestisci Lista
+                    </button>
+                </div>
+            </div>
+
+            <!-- Codice Referral -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <div>
+                        <h3>Codice Referral</h3>
+                        <p>Condividi e guadagna Cheers</p>
+                    </div>
+                </div>
+                <div class="invite-generator">
+                    <div class="qr-code">
+                        <div>
+                            <i class="fas fa-qrcode" style="font-size: 40px; color: #333;"></i>
+                            <p style="margin: 10px 0 0 0; color: #666;">MCSPR2024</p>
+                        </div>
+                    </div>
+                    <p><strong>Codice: MCSPR2024</strong></p>
+                    <button class="btn-gradient" onclick="shareReferralCode()">
+                        <i class="fas fa-share"></i> Condividi Codice
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vibes Track -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <h3>Vibes Track</h3>
+                        <p>Hype dei tuoi eventi in tempo reale</p>
+                    </div>
+                </div>
+                <div class="vibes-track">
+                    <h4>Saturday Night Fever</h4>
+                    <div class="vibes-meter">
+                        <div class="vibes-fill" style="width: 78%;"></div>
+                    </div>
+                    <p><strong>78% Vibes Level</strong> 🔥</p>
+                    <p>📈 +12% dall'ultima settimana</p>
+                </div>
+            </div>
+
+            <!-- Smart Invite Generator -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <div>
+                        <h3>Smart Invite</h3>
+                        <p>Genera locandine animate</p>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <p>🎨 Crea locandine personalizzate per i social</p>
+                    <button class="btn-gradient" onclick="openInviteGenerator()">
+                        <i class="fas fa-paint-brush"></i> Genera Locandina
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat con Gestori -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div>
+                        <h3>Chat Dirette</h3>
+                        <p>Messaggi con gestori locali</p>
+                    </div>
+                </div>
+                <div>
+                    <div style="margin-bottom: 15px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                        <strong>Club Elite</strong>
+                        <p style="margin: 5px 0; font-size: 14px; opacity: 0.8;">Confermi per venerdì sera?</p>
+                        <small style="opacity: 0.6;">2 ore fa</small>
+                    </div>
+                    <button class="btn-gradient" onclick="openChatManager()">
+                        <i class="fas fa-envelope"></i> Apri Chat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per Creazione Eventi -->
+    <div id="createEventModal" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3>🎵 Crea Nuovo Evento</h3>
+                <button onclick="closeModal('createEventModal')" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <form id="createEventForm">
+                <div style="margin-bottom: 15px;">
+                    <label>Nome Evento</label>
+                    <input type="text" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Data e Ora</label>
+                    <input type="datetime-local" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; margin-top: 5px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label>Locale</label>
+                    <select style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; margin-top: 5px;">
+                        <option>Seleziona locale...</option>
+                        <option>Discoteca XYZ</option>
+                        <option>Club Elite</option>
+                        <option>The Underground</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-gradient" style="width: 100%;">
+                    <i class="fas fa-calendar-plus"></i> Crea Evento
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/pr-dashboard.js"></script>
+</body>
+</html>
