@@ -95,3 +95,72 @@ class Flir2nightForum {
         // Carica i post dal database
         await this.loadPostsFromDatabase();
     }
+async loadPostsFromDatabase() {
+        try {
+            // Usa Netlify Functions invece di chiamate dirette a Supabase
+            const response = await fetch('/api/forum-posts', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to load posts');
+            }
+
+            // Convert database posts to frontend format
+            this.posts = data.posts.map(post => ({
+                id: post.id,
+                title: post.title,
+                content: post.content,
+                category: post.category,
+                tags: post.tags || [],
+                images: post.images || [],
+                author: {
+                    username: post.author_username,
+                    avatar: this.getAuthorAvatar(post.author_username),
+                    reputation: 0,
+                    badge: this.getAuthorBadge(post.author_username)
+                },
+                timestamp: new Date(post.created_at),
+                likes: post.likes || 0,
+                comments: post.comments || 0,
+                views: post.views || 0,
+                isLiked: false,
+                isSaved: false
+            }));
+
+            console.log('Posts loaded successfully:', this.posts.length);
+
+        } catch (error) {
+            console.error('Error loading posts:', error);
+            this.posts = [];
+            
+            // Mostra errore all'utente
+            if (window.app && window.app.showToast) {
+                window.app.showToast('Errore nel caricamento dei post', 'error');
+            }
+        }
+    }
+
+    getAuthorAvatar(username) {
+        const avatars = ['🌟', '💕', '🎧', '👑', '✨', '🎭', '🔥', '💎', '🌙', '⭐'];
+        const index = username.length % avatars.length;
+        return avatars[index];
+    }
+
+    getAuthorBadge(username) {
+        if (username.includes('PR') || username.includes('Official')) return 'Verified PR';
+        if (username.includes('DJ') || username.includes('Beat')) return 'Music Expert';
+        if (username.includes('Queen') || username.includes('King')) return 'Gold Matcher';
+        if (username.includes('Review')) return 'Review Master';
+        if (username.includes('Fashion') || username.includes('Style')) return 'Style Guru';
+        return 'Community Member';
+    }
