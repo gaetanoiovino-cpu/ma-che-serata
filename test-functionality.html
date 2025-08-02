@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Funzionalità - Ma Che Serata</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .test-button:hover {
+            background: #5a6fd8;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.ok { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 4px solid #667eea;
+            background: #f8f9ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Funzionalità Ma Che Serata</h1>
+    <p>Questa pagina verifica che tutte le funzionalità principali siano operative.</p>
+
+    <div class="test-section">
+        <h2>📄 File Principali</h2>
+        <div id="fileTests">
+            <div class="test-result">
+                <strong>index.html:</strong> <span id="indexStatus">Controllando...</span>
+            </div>
+            <div class="test-result">
+                <strong>dashboard.html:</strong> <span id="dashboardStatus">Controllando...</span>
+            </div>
+            <div class="test-result">
+                <strong>styles.css:</strong> <span id="stylesStatus">Controllando...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 JavaScript Core</h2>
+        <button class="test-button" onclick="testJavaScriptCore()">Testa JS Core</button>
+        <div id="jsResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎮 Sistemi Avanzati</h2>
+        <button class="test-button" onclick="testGamification()">Testa Gamification</button>
+        <button class="test-button" onclick="testI18n()">Testa i18n</button>
+        <button class="test-button" onclick="testFeedback()">Testa Feedback</button>
+        <button class="test-button" onclick="testGDPR()">Testa GDPR</button>
+        <div id="advancedResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔄 Dashboard Router</h2>
+        <button class="test-button" onclick="testRouter('matcher')">Test Matcher</button>
+        <button class="test-button" onclick="testRouter('pr')">Test PR</button>
+        <button class="test-button" onclick="testRouter('manager')">Test Manager</button>
+        <button class="test-button" onclick="testRouter('artist')">Test Artist</button>
+        <div id="routerResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Dashboard Specifiche</h2>
+        <button class="test-button" onclick="window.open('dashboard.html', '_blank')">🎭 Matcher Dashboard</button>
+        <button class="test-button" onclick="window.open('pr-dashboard.html', '_blank')">📢 PR Dashboard</button>
+        <button class="test-button" onclick="window.open('manager-dashboard.html', '_blank')">🏢 Manager Dashboard</button>
+        <button class="test-button" onclick="window.open('artist-dashboard.html', '_blank')">🎵 Artist Dashboard</button>
+        <button class="test-button" onclick="window.open('investors-dashboard.html', '_blank')">📊 Investors Dashboard</button>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Test Integrazione</h2>
+        <button class="test-button" onclick="testRegistrationFlow()">Test Registrazione</button>
+        <button class="test-button" onclick="testEventBooking()">Test Prenotazione</button>
+        <button class="test-button" onclick="testNotifications()">Test Notifiche</button>
+        <div id="integrationResults"></div>
+    </div>
+
+    <!-- Include degli script -->
+    <script src="js/app.js"></script>
+    <script src="js/dashboard-router.js"></script>
+    <script src="js/gamification.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/feedback-system.js"></script>
+    <script src="js/push-notifications.js"></script>
+    <script src="js/gdpr-compliance.js"></script>
+
+    <script>
+        // Test automatici al caricamento
+        document.addEventListener('DOMContentLoaded', function() {
+            checkFileAvailability();
+        });
+
+        function checkFileAvailability() {
+            // Test esistenza file principali
+            checkFile('index.html', 'indexStatus');
+            checkFile('dashboard.html', 'dashboardStatus');
+            checkFile('styles.css', 'stylesStatus');
+        }
+
+        function checkFile(filename, statusId) {
+            fetch(filename)
+                .then(response => {
+                    const statusEl = document.getElementById(statusId);
+                    if (response.ok) {
+                        statusEl.innerHTML = '<span class="status ok">✅ OK</span>';
+                    } else {
+                        statusEl.innerHTML = '<span class="status error">❌ Error ' + response.status + '</span>';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById(statusId).innerHTML = '<span class="status error">❌ Failed</span>';
+                });
+        }
+
+        function testJavaScriptCore() {
+            const results = document.getElementById('jsResults');
+            let output = '<h3>Risultati Test JS Core:</h3>';
+            
+            try {
+                // Test window.app
+                if (typeof window.app !== 'undefined') {
+                    output += '<div class="test-result">✅ window.app: Disponibile</div>';
+                } else {
+                    output += '<div class="test-result">❌ window.app: Non disponibile</div>';
+                }
+
+                // Test DashboardRouter
+                if (typeof window.dashboardRouter !== 'undefined') {
+                    output += '<div class="test-result">✅ DashboardRouter: Inizializzato</div>';
+                } else {
+                    output += '<div class="test-result">❌ DashboardRouter: Non disponibile</div>';
+                }
+
+                // Test funzioni globali
+                const globalFunctions = ['showLoginModal', 'showRegisterModal', 'toggleMobileMenu'];
+                globalFunctions.forEach(func => {
+                    if (typeof window[func] === 'function') {
+                        output += `<div class="test-result">✅ ${func}: Funzione disponibile</div>`;
+                    } else {
+                        output += `<div class="test-result">❌ ${func}: Funzione mancante</div>`;
+                    }
+                });
+
+            } catch (error) {
+                output += `<div class="test-result">❌ Errore: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = output;
+        }
+
+        function testGamification() {
+            const results = document.getElementById('advancedResults');
+            let output = '<h3>Test Gamification:</h3>';
+            
+            try {
+                if (typeof window.gamificationSystem !== 'undefined') {
+                    output += '<div class="test-result">✅ Gamification System: Inizializzato</div>';
+                    
+                    // Test aggiunta punti
+                    window.gamificationSystem.addCheersPoints(50, 'Test points');
+                    output += '<div class="test-result">✅ Aggiunta punti: Funzionante</div>';
+                } else {
+                    output += '<div class="test-result">❌ Gamification System: Non disponibile</div>';
+                }
+            } catch (error) {
+                output += `<div class="test-result">❌ Errore Gamification: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = output;
+        }
+
+        function testI18n() {
+            const results = document.getElementById('advancedResults');
+            let output = '<h3>Test i18n:</h3>';
+            
+            try {
+                if (typeof window.i18n !== 'undefined') {
+                    output += '<div class="test-result">✅ i18n System: Inizializzato</div>';
+                    
+                    // Test cambio lingua
+                    const currentLang = window.i18n.getCurrentLanguage();
+                    output += `<div class="test-result">✅ Lingua corrente: ${currentLang.name}</div>`;
+                    
+                    // Test traduzione
+                    const translation = window.i18n.t('nav.home');
+                    output += `<div class="test-result">✅ Test traduzione: "${translation}"</div>`;
+                } else {
+                    output += '<div class="test-result">❌ i18n System: Non disponibile</div>';
+                }
+            } catch (error) {
+                output += `<div class="test-result">❌ Errore i18n: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = output;
+        }
+
+        function testFeedback() {
+            const results = document.getElementById('advancedResults');
+            let output = '<h3>Test Feedback System:</h3>';
+            
+            try {
+                if (typeof window.feedbackSystem !== 'undefined') {
+                    output += '<div class="test-result">✅ Feedback System: Inizializzato</div>';
+                    
+                    // Test programmazione feedback
+                    window.feedbackSystem.scheduleEventFeedback(
+                        'event_test',
+                        'Test Event',
+                        new Date(Date.now() + 1000).toISOString(),
+                        'user_test'
+                    );
+                    output += '<div class="test-result">✅ Programmazione feedback: Funzionante</div>';
+                } else {
+                    output += '<div class="test-result">❌ Feedback System: Non disponibile</div>';
+                }
+            } catch (error) {
+                output += `<div class="test-result">❌ Errore Feedback: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = output;
+        }
+
+        function testGDPR() {
+            const results = document.getElementById('advancedResults');
+            let output = '<h3>Test GDPR System:</h3>';
+            
+            try {
+                if (typeof window.gdprSystem !== 'undefined') {
+                    output += '<div class="test-result">✅ GDPR System: Inizializzato</div>';
+                    
+                    // Test stato consenso
+                    const consentStatus = window.gdprSystem.consentGiven;
+                    output += `<div class="test-result">✅ Stato consenso: ${consentStatus ? 'Dato' : 'Non dato'}</div>`;
+                } else {
+                    output += '<div class="test-result">❌ GDPR System: Non disponibile</div>';
+                }
+            } catch (error) {
+                output += `<div class="test-result">❌ Errore GDPR: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = output;
+        }
+
+        function testRouter(userType) {
+            const results = document.getElementById('routerResults');
+            let output = `<h3>Test Router per ${userType}:</h3>`;
+            
+            try {
+                if (typeof window.dashboardRouter !== 'undefined') {
+                    // Simula cambio tipo utente
+                    localStorage.setItem('ma-che-serata-user-type', userType);
+                    
+                    const dashboardUrl = window.dashboardRouter.getUserDashboardUrl();
+                    output += `<div class="test-result">✅ URL Dashboard ${userType}: ${dashboardUrl}</div>`;
+                    
+                    // Test messaggio benvenuto
+                    const welcomeMsg = window.dashboardRouter.getWelcomeMessage(userType);
+                    output += `<div class="test-result">✅ Messaggio benvenuto: ${welcomeMsg}</div>`;
+                    
+                } else {
+                    output += '<div class="test-result">❌ Dashboard Router: Non disponibile</div>';
+                }
+            } catch (error) {
+                output += `<div class="test-result">❌ Errore Router: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = output;
+        }
+
+        function testRegistrationFlow() {
+            const results = document.getElementById('integrationResults');
+            let output = '<h3>Test Flusso Registrazione:</h3>';
+            
+            try {
+                // Simula apertura modal registrazione
+                if (typeof showRegisterModal === 'function') {
+                    output += '<div class="test-result">✅ Modal registrazione: Disponibile</div>';
+                    
+                    // Test validazione form (se disponibile)
+                    if (typeof window.authSystem !== 'undefined') {
+                        output += '<div class="test-result">✅ Auth System: Inizializzato</div>';
+                    }
+                } else {
+                    output += '<div class="test-result">❌ Modal registrazione: Non disponibile</div>';
+                }
+                
+            } catch (error) {
+                output += `<div class="test-result">❌ Errore registrazione: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = output;
+        }
+
+        function testEventBooking() {
+            const results = document.getElementById('integrationResults');
+            let output = '<h3>Test Prenotazione Eventi:</h3>';
+            
+            try {
+                // Simula trigger evento prenotazione
+                window.dispatchEvent(new CustomEvent('eventBooked', {
+                    detail: {
+                        eventId: 'test_event',
+                        eventTitle: 'Test Event',
+                        eventDate: new Date().toISOString(),
+                        userId: 'test_user'
+                    }
+                }));
+                
+                output += '<div class="test-result">✅ Evento prenotazione: Triggato</div>';
+                
+            } catch (error) {
+                output += `<div class="test-result">❌ Errore prenotazione: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = output;
+        }
+
+        function testNotifications() {
+            const results = document.getElementById('integrationResults');
+            let output = '<h3>Test Sistema Notifiche:</h3>';
+            
+            try {
+                if (typeof window.pushNotificationSystem !== 'undefined') {
+                    output += '<div class="test-result">✅ Push Notification System: Inizializzato</div>';
+                    
+                    // Test supporto notifiche
+                    const supported = window.pushNotificationSystem.isSupported;
+                    output += `<div class="test-result">✅ Supporto browser: ${supported ? 'Sì' : 'No'}</div>`;
+                    
+                } else {
+                    output += '<div class="test-result">❌ Push Notification System: Non disponibile</div>';
+                }
+                
+            } catch (error) {
+                output += `<div class="test-result">❌ Errore notifiche: ${error.message}</div>`;
+            }
+            
+            results.innerHTML = output;
+        }
+    </script>
+</body>
+</html>

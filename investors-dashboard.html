@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investors Dashboard - Ma Che Serata</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <style>
+        .investors-dashboard {
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            min-height: 100vh;
+            padding: 2rem;
+            color: white;
+        }
+
+        .investors-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .investors-header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .period-selector {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .period-btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .period-btn.active {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .kpi-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ffd700, #ffed4e, #ff6b6b);
+        }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-label {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .kpi-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .trend-up { color: #4ade80; }
+        .trend-down { color: #f87171; }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-container {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .heatmap-container {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 3rem;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-top: 1rem;
+        }
+
+        .heatmap-day {
+            aspect-ratio: 1;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .heatmap-legend {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .export-section {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .export-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .metrics-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .comparison-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .comparison-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .comparison-vs {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .vs-period {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .vs-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .investors-dashboard {
+                padding: 1rem;
+            }
+            
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .period-selector {
+                flex-wrap: wrap;
+            }
+            
+            .export-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="investors-dashboard">
+        <!-- Header -->
+        <div class="investors-header">
+            <h1>📊 Investors Dashboard</h1>
+            <p>Analytics & Performance per Partner e Investitori</p>
+            <div class="period-selector">
+                <button class="period-btn active" data-period="7d">7 Giorni</button>
+                <button class="period-btn" data-period="30d">30 Giorni</button>
+                <button class="period-btn" data-period="90d">3 Mesi</button>
+                <button class="period-btn" data-period="1y">1 Anno</button>
+            </div>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-value" id="totalUsers">12,847</div>
+                <div class="kpi-label">Utenti Totali</div>
+                <div class="kpi-trend trend-up">
+                    📈 +23.5% vs periodo precedente
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-value" id="eventBookings">3,421</div>
+                <div class="kpi-label">Prenotazioni Eventi</div>
+                <div class="kpi-trend trend-up">
+                    📈 +18.2% vs periodo precedente
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-value" id="conversionRate">67.8%</div>
+                <div class="kpi-label">Conversion Rate</div>
+                <div class="kpi-trend trend-up">
+                    📈 +5.3% vs periodo precedente
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-value" id="soldOutEvents">89%</div>
+                <div class="kpi-label">Eventi Sold-Out</div>
+                <div class="kpi-trend trend-up">
+                    📈 +12.7% vs periodo precedente
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-value" id="avgEngagement">4.2min</div>
+                <div class="kpi-label">Engagement Medio</div>
+                <div class="kpi-trend trend-up">
+                    📈 +8.9% vs periodo precedente
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-value" id="revenue">€84,230</div>
+                <div class="kpi-label">Revenue Totale</div>
+                <div class="kpi-trend trend-up">
+                    📈 +31.4% vs periodo precedente
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <div class="chart-container">
+                <div class="chart-title">📈 Crescita Utenti</div>
+                <canvas id="userGrowthChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">🎟️ Prenotazioni per Categoria</div>
+                <canvas id="bookingsCategoryChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">💰 Revenue Trend</div>
+                <canvas id="revenueChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">🎯 Funnel Conversione</div>
+                <canvas id="conversionFunnelChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Heatmap Zone Milano -->
+        <div class="heatmap-container">
+            <div class="chart-title">🗺️ Heatmap Prenotazioni Milano</div>
+            <div id="milanosMap" style="height: 400px; background: rgba(255,255,255,0.1); border-radius: 15px; display: flex; align-items: center; justify-content: center;">
+                <div style="text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🗺️</div>
+                    <div>Mappa Interattiva Milano</div>
+                    <div style="font-size: 0.9rem; opacity: 0.7; margin-top: 0.5rem;">
+                        Navigli: 847 prenotazioni | Brera: 623 | Porta Garibaldi: 521
+                    </div>
+                </div>
+            </div>
+            <div class="heatmap-legend">
+                <span>🟢 Alta densità (500+)</span>
+                <span>🟡 Media densità (200-500)</span>
+                <span>🔴 Bassa densità (0-200)</span>
+            </div>
+        </div>
+
+        <!-- Metrics Comparison -->
+        <div class="metrics-comparison">
+            <div class="comparison-card">
+                <div class="comparison-title">📊 Performance vs Competitors</div>
+                <div class="comparison-vs">
+                    <div>
+                        <div class="vs-period">Ma Che Serata</div>
+                        <div class="vs-value" style="color: #4ade80;">67.8%</div>
+                    </div>
+                    <div style="font-size: 1.5rem;">VS</div>
+                    <div>
+                        <div class="vs-period">Industry Avg</div>
+                        <div class="vs-value" style="color: #f87171;">42.3%</div>
+                    </div>
+                </div>
+                <div style="text-align: center; font-size: 0.9rem; opacity: 0.8;">
+                    Conversion Rate superiore del 60.3%
+                </div>
+            </div>
+
+            <div class="comparison-card">
+                <div class="comparison-title">⭐ Customer Satisfaction</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; margin: 1rem 0;">4.8⭐</div>
+                    <div>Media recensioni: 4.8/5</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">
+                        Su 2,341 recensioni totali
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-card">
+                <div class="comparison-title">🎯 User Retention</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 2.5rem; margin: 1rem 0; color: #4ade80;">84.2%</div>
+                    <div>Retention Rate 30 giorni</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">
+                        +15.7% sopra target
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <h3>📊 Esporta Report</h3>
+            <p>Genera report dettagliati per presentazioni e analisi</p>
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportPDF()">📄 Export PDF</button>
+                <button class="export-btn" onclick="exportExcel()">📊 Export Excel</button>
+                <button class="export-btn" onclick="exportPowerPoint()">📋 Export PowerPoint</button>
+                <button class="export-btn" onclick="shareReport()">🔗 Condividi Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/investors-dashboard.js"></script>
+</body>
+</html>

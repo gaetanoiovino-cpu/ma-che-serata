@@ -27,46 +27,84 @@ exports.handler = async (event, context) => {
         );
 
         // Parse multipart form data
-        const boundary = event.headers['content-type'].split('boundary=')[1];
-        const parts = event.body.split(`--${boundary}`);
+        const contentType = event.headers['content-type'] || event.headers['Content-Type'];
+        
+        if (!contentType || !contentType.includes('multipart/form-data')) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: 'Invalid content type. Expected multipart/form-data' })
+            };
+        }
+
+        const boundary = contentType.split('boundary=')[1];
+        if (!boundary) {
+            return {
+                statusCode: 400,
+                headers,
+                body: JSON.stringify({ error: 'No boundary found in content-type' })
+            };
+        }
+
+        // Decode base64 body if needed
+        const body = event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString('binary') : event.body;
+        const parts = body.split(`--${boundary}`);
         
         let fileData = null;
-        let fileName = null;
+        let fileName = 'uploaded-image';
+        let fileContentType = 'image/jpeg';
         
         for (const part of parts) {
             if (part.includes('Content-Disposition: form-data; name="file"')) {
                 const lines = part.split('\r\n');
                 const headerEnd = lines.findIndex(line => line === '');
-                const fileContent = lines.slice(headerEnd + 1, -1).join('\r\n');
+                
+                // Extract headers
+                const headers = lines.slice(0, headerEnd);
+                const dispositionLine = headers.find(line => line.includes('Content-Disposition'));
+                const contentTypeLine = headers.find(line => line.includes('Content-Type'));
                 
                 // Extract filename
-                const dispositionLine = lines.find(line => line.includes('Content-Disposition'));
-                const filenameMatch = dispositionLine.match(/filename="([^"]+)"/);
-                fileName = filenameMatch ? filenameMatch[1] : 'uploaded-image';
+                if (dispositionLine) {
+                    const filenameMatch = dispositionLine.match(/filename="([^"]+)"/);
+                    fileName = filenameMatch ? filenameMatch[1] : 'uploaded-image';
+                }
                 
-                // Convert base64 to buffer if needed
-                fileData = Buffer.from(fileContent, 'binary');
+                // Extract content type
+                if (contentTypeLine) {
+                    fileContentType = contentTypeLine.split(':')[1].trim();
+                }
+                
+                // Extract file content (skip empty lines at the end)
+                const fileContent = lines.slice(headerEnd + 1).join('\r\n');
+                const cleanContent = fileContent.replace(/\r\n$/, ''); // Remove trailing newlines
+                
+                fileData = event.isBase64Encoded ? 
+                    Buffer.from(cleanContent, 'binary') : 
+                    Buffer.from(cleanContent, 'utf8');
                 break;
             }
         }
 
-        if (!fileData) {
+        if (!fileData || fileData.length === 0) {
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({ error: 'No file data found' })
+                body: JSON.stringify({ error: 'No file data found or file is empty' })
             };
         }
 
         // Generate unique filename
         const timestamp = Date.now();
-        const uniqueFileName = `${timestamp}-${fileName}`;
+        const fileExtension = fileName.split('.').pop() || 'jpg';
+        const uniqueFileName = `flir2night/${timestamp}-${Math.random().toString(36).substring(7)}.${fileExtension}`;
 
         // Upload to Supabase Storage
         const { data, error } = await supabase.storage
             .from('post-images')
             .upload(uniqueFileName, fileData, {
-                contentType: event.headers['content-type'] || 'image/jpeg'
+                contentType: fileContentType,
+                upsert: false
             });
 
         if (error) {

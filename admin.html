@@ -510,9 +510,19 @@
                         <input type="text" class="search-input" placeholder="Cerca utenti..." id="userSearch">
                         <select class="filter-select" id="userFilter">
                             <option value="all">Tutti gli utenti</option>
-                            <option value="pending">In attesa approvazione</option>
+                            <option value="pending_validation">In attesa validazione</option>
+                            <option value="trial_period">Periodo prova (48h)</option>
                             <option value="active">Attivi</option>
                             <option value="banned">Bannati</option>
+                            <option value="matcher">Matcher</option>
+                            <option value="professional">Professionisti</option>
+                        </select>
+                        <select class="filter-select" id="userTypeFilter">
+                            <option value="all">Tutti i tipi</option>
+                            <option value="matcher">Matcher</option>
+                            <option value="artist">Artista</option>
+                            <option value="manager">Gestore Locale</option>
+                            <option value="pr">PR/Promoter</option>
                         </select>
                     </div>
 
@@ -521,8 +531,9 @@
                             <tr>
                                 <th>Utente</th>
                                 <th>Email</th>
-                                <th>Ruolo</th>
+                                <th>Tipo Account</th>
                                 <th>Status</th>
+                                <th>Scadenza Prova</th>
                                 <th>Registrazione</th>
                                 <th>Azioni</th>
                             </tr>

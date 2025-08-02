@@ -93,7 +93,35 @@ class AdminManager {
         }
     }
 
-    loadMockData() {
+    async loadMockData() {
+        await this.loadUsersData();
+        this.loadEventsData();
+    }
+
+    async loadUsersData() {
+        try {
+            // Load real users from API
+            const response = await fetch('/api/admin-users', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    this.users = data.users;
+                    console.log('Users loaded successfully:', this.users.length);
+                    return;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading users:', error);
+        }
+
+        // Fallback to mock data if API fails
+        console.log('Using mock user data');
         this.users = [
             {
                 id: 1,
@@ -156,7 +184,9 @@ class AdminManager {
                 instagramHandle: null
             }
         ];
+    }
 
+    loadEventsData() {
         this.events = [
             {
                 id: 1,
@@ -260,17 +290,21 @@ class AdminManager {
                 <td>
                     <div class="user-info">
                         <strong>${user.username}</strong>
-                        <small>Rep: ${user.reputation}</small>
+                        <small>Rep: ${user.reputation || 0}</small>
+                        ${user.professional_details ? `<div class="business-info">${user.professional_details.business_name || ''}</div>` : ''}
                     </div>
                 </td>
                 <td>${user.email}</td>
                 <td>
-                    <span class="role-badge role-${user.role}">${this.formatRole(user.role)}</span>
+                    <span class="role-badge role-${user.user_type || user.role}">${this.formatUserType(user.user_type || user.role)}</span>
                 </td>
                 <td>
-                    <span class="status-badge status-${user.status}">${this.formatStatus(user.status)}</span>
+                    <span class="status-badge status-${user.account_status || user.status}">${this.formatStatus(user.account_status || user.status)}</span>
                 </td>
-                <td>${this.formatDate(user.registeredAt)}</td>
+                <td>
+                    ${user.trialStatus ? `<span class="trial-status">${user.trialStatus}</span>` : '-'}
+                </td>
+                <td>${this.formatDate(user.created_at || user.registeredAt)}</td>
                 <td>
                     <div class="action-buttons">
                         ${this.getUserActionButtons(user)}
@@ -315,31 +349,48 @@ class AdminManager {
     }
 
     getUserActionButtons(user) {
-        switch (user.status) {
+        const status = user.account_status || user.status;
+        const userId = user.id;
+        
+        switch (status) {
+            case 'pending_validation':
             case 'pending':
                 return `
-                    <button class="btn-action btn-approve" onclick="adminManager.approveUser(${user.id})">
+                    <button class="btn-action btn-approve" onclick="adminManager.approveUser(${userId})">
                         Approva
                     </button>
-                    <button class="btn-action btn-reject" onclick="adminManager.rejectUser(${user.id})">
+                    <button class="btn-action btn-reject" onclick="adminManager.rejectUser(${userId})">
+                        Rifiuta
+                    </button>
+                `;
+            case 'trial_period':
+                return `
+                    <button class="btn-action btn-approve" onclick="adminManager.approveUser(${userId})">
+                        Approva Definitivo
+                    </button>
+                    <button class="btn-action btn-extend" onclick="adminManager.extendTrial(${userId})">
+                        Estendi Prova (+48h)
+                    </button>
+                    <button class="btn-action btn-reject" onclick="adminManager.rejectUser(${userId})">
                         Rifiuta
                     </button>
                 `;
             case 'active':
                 return `
-                    <button class="btn-action btn-ban" onclick="adminManager.banUser(${user.id})">
+                    <button class="btn-action btn-ban" onclick="adminManager.banUser(${userId})">
                         Banna
                     </button>
-                    <button class="btn-action btn-view" onclick="adminManager.viewUser(${user.id})">
+                    <button class="btn-action btn-view" onclick="adminManager.viewUser(${userId})">
                         Dettagli
                     </button>
                 `;
             case 'banned':
+            case 'rejected':
                 return `
-                    <button class="btn-action btn-approve" onclick="adminManager.unbanUser(${user.id})">
-                        Sbanna
+                    <button class="btn-action btn-approve" onclick="adminManager.unbanUser(${userId})">
+                        Riattiva
                     </button>
-                    <button class="btn-action btn-view" onclick="adminManager.viewUser(${user.id})">
+                    <button class="btn-action btn-view" onclick="adminManager.viewUser(${userId})">
                         Dettagli
                     </button>
                 `;
@@ -671,23 +722,33 @@ class AdminManager {
     }
 
     // Utility methods
-    formatRole(role) {
-        const roles = {
+    formatUserType(userType) {
+        const types = {
             'matcher': 'Matcher',
-            'pr': 'PR',
-            'venue': 'Locale',
+            'pr': 'PR/Promoter',
+            'manager': 'Gestore Locale',
             'artist': 'Artista',
-            'admin': 'Admin'
+            'admin': 'Admin',
+            'venue': 'Locale' // backward compatibility
         };
-        return roles[role] || role;
+        return types[userType] || userType;
+    }
+
+    formatRole(role) {
+        // Keep for backward compatibility
+        return this.formatUserType(role);
     }
 
     formatStatus(status) {
         const statuses = {
             'active': 'Attivo',
-            'pending': 'In Attesa',
+            'pending_validation': 'In Attesa Validazione',
+            'trial_period': 'Periodo Prova',
             'banned': 'Bannato',
-            'suspended': 'Sospeso'
+            'rejected': 'Rifiutato',
+            'suspended': 'Sospeso',
+            // backward compatibility
+            'pending': 'In Attesa'
         };
         return statuses[status] || status;
     }

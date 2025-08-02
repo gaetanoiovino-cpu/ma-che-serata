@@ -78,6 +78,39 @@ class Flir2nightForum {
                 this.handleCreatePost(e);
             });
         }
+
+        // Photo preview handler
+        const photoInput = document.getElementById('photoInput');
+        if (photoInput) {
+            photoInput.addEventListener('change', (e) => {
+                this.handlePhotoPreview(e);
+            });
+        }
+
+        // Drag & Drop for photo upload
+        const fileUploadLabel = document.querySelector('.file-upload-label');
+        if (fileUploadLabel) {
+            fileUploadLabel.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadLabel.classList.add('drag-over');
+            });
+
+            fileUploadLabel.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                fileUploadLabel.classList.remove('drag-over');
+            });
+
+            fileUploadLabel.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadLabel.classList.remove('drag-over');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    photoInput.files = files;
+                    this.handlePhotoPreview({ target: photoInput });
+                }
+            });
+        }
     }
 
     async loadMockData() {
@@ -551,7 +584,74 @@ renderPostCard(post) {
         if (modal) {
             modal.style.display = 'none';
             document.body.style.overflow = '';
+            
+            // Reset photo preview
+            const photoPreview = document.getElementById('photoPreview');
+            const photoInput = document.getElementById('photoInput');
+            if (photoPreview) {
+                photoPreview.style.display = 'none';
+                photoPreview.querySelector('.preview-images').innerHTML = '';
+            }
+            if (photoInput) {
+                photoInput.value = '';
+            }
         }
+    }
+
+    handlePhotoPreview(e) {
+        const files = e.target.files;
+        const photoPreview = document.getElementById('photoPreview');
+        const previewImages = photoPreview.querySelector('.preview-images');
+        
+        if (files.length === 0) {
+            photoPreview.style.display = 'none';
+            return;
+        }
+        
+        // Limit to 5 photos
+        const filesToProcess = Array.from(files).slice(0, 5);
+        
+        previewImages.innerHTML = '';
+        photoPreview.style.display = 'block';
+        
+        filesToProcess.forEach((file, index) => {
+            if (!file.type.startsWith('image/')) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                previewItem.innerHTML = `
+                    <img src="${e.target.result}" alt="Preview ${index + 1}">
+                    <button type="button" class="remove-photo" onclick="flir2night.removePhoto(${index})">×</button>
+                    <span class="photo-name">${file.name}</span>
+                `;
+                previewImages.appendChild(previewItem);
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        if (files.length > 5) {
+            window.app.showToast('Massimo 5 foto consentite. Prime 5 selezionate.', 'warning');
+        }
+    }
+
+    removePhoto(index) {
+        const photoInput = document.getElementById('photoInput');
+        const files = Array.from(photoInput.files);
+        
+        // Create new FileList without the removed file
+        const dt = new DataTransfer();
+        files.forEach((file, i) => {
+            if (i !== index) {
+                dt.items.add(file);
+            }
+        });
+        
+        photoInput.files = dt.files;
+        
+        // Refresh preview
+        this.handlePhotoPreview({ target: photoInput });
     }
 
     async handleCreatePost(e) {
@@ -567,39 +667,70 @@ renderPostCard(post) {
         submitBtn.disabled = true;
         
         try {
-            // Per ora, salviamo il post SENZA immagini per evitare problemi CORS
-            // Le immagini verranno aggiunte in una versione futura
+            // Handle image uploads prima di creare postData
+            let imageUrls = [];
+            const fileInput = form.querySelector('input[type="file"]');
+
+            if (fileInput && fileInput.files.length > 0) {
+                submitBtn.textContent = '📷 Caricamento foto...';
+                
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    const file = fileInput.files[i];
+                    
+                    // Validate file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        window.app.showToast(`File ${file.name} troppo grande (max 5MB)`, 'error');
+                        continue;
+                    }
+                    
+                    // Validate file type
+                    if (!file.type.startsWith('image/')) {
+                        window.app.showToast(`File ${file.name} non è un'immagine`, 'error');
+                        continue;
+                    }
+                    
+                    const uploadFormData = new FormData();
+                    uploadFormData.append('file', file);
+                    
+                    try {
+                        submitBtn.textContent = `📷 Caricamento ${i + 1}/${fileInput.files.length}...`;
+                        
+                        const uploadResponse = await fetch('/api/upload-image', {
+                            method: 'POST',
+                            body: uploadFormData
+                        });
+                        
+                        if (uploadResponse.ok) {
+                            const uploadData = await uploadResponse.json();
+                            if (uploadData.success) {
+                                imageUrls.push(uploadData.url);
+                                window.app.showToast(`Foto ${i + 1} caricata!`, 'success');
+                            } else {
+                                window.app.showToast(`Errore caricamento foto ${i + 1}: ${uploadData.error}`, 'error');
+                            }
+                        } else {
+                            const errorText = await uploadResponse.text();
+                            window.app.showToast(`Errore HTTP caricamento foto ${i + 1}: ${errorText}`, 'error');
+                        }
+                    } catch (uploadError) {
+                        console.error('Upload error:', uploadError);
+                        window.app.showToast(`Errore rete foto ${i + 1}: ${uploadError.message}`, 'error');
+                    }
+                }
+                
+                if (imageUrls.length > 0) {
+                    window.app.showToast(`${imageUrls.length} foto caricate con successo!`, 'success');
+                }
+                
+                submitBtn.textContent = '💾 Salvataggio post...';
+            }
+
             const postData = {
                 title: formData.get('title'),
                 content: formData.get('content'),
                 category: formData.get('category'),
                 tags: formData.get('tags').split(',').map(tag => tag.trim()).filter(tag => tag),
-// Handle image uploads prima di creare postData
-let imageUrls = [];
-const fileInput = form.querySelector('input[type="file"]');
-
-if (fileInput && fileInput.files.length > 0) {
-    for (let i = 0; i < fileInput.files.length; i++) {
-        const file = fileInput.files[i];
-        const formData = new FormData();
-        formData.append('file', file);
-        
-        const uploadResponse = await fetch('/api/upload-image', {
-            method: 'POST',
-            body: formData
-        });
-        
-        if (uploadResponse.ok) {
-            const uploadData = await uploadResponse.json();
-            if (uploadData.success) {
-                imageUrls.push(uploadData.url);
-            }
-        }
-    }
-}
-
-// Poi usa imageUrls invece di array vuoto
-images: imageUrls,
+                images: imageUrls,
                 author_id: window.app.user.id,
                 author_username: window.app.user.username,
                 likes: 0,
