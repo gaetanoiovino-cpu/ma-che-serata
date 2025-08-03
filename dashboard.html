@@ -7,6 +7,13 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <script src="js/app.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/dashboard-router.js"></script>
+    <script src="js/gamification.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/feedback-system.js"></script>
+    <script src="js/push-notifications.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -65,6 +72,68 @@
                         <div class="stat-info">
                             <span class="stat-number">4.8</span>
                             <span class="stat-label">Rating Medio</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Section -->
+                <div class="profile-section" id="profileSection">
+                    <div class="profile-header">
+                        <h2>👤 Il Tuo Profilo Matcher</h2>
+                        <p>Personalizza il tuo profilo per farti conoscere dalla community!</p>
+                    </div>
+                    
+                    <div class="profile-content">
+                        <div class="profile-photo-section">
+                            <div class="profile-photo-container">
+                                <img src="" alt="Foto Profilo" id="profilePhoto" class="profile-photo">
+                                <div class="profile-photo-placeholder" id="photoPlaceholder">
+                                    <span>📷</span>
+                                    <span>Aggiungi Foto</span>
+                                </div>
+                                <button class="photo-edit-btn" onclick="dashboard.editProfilePhoto()">
+                                    ✏️
+                                </button>
+                            </div>
+                            <input type="file" id="profilePhotoInput" accept="image/*" style="display: none;">
+                        </div>
+                        
+                        <div class="profile-info-section">
+                            <div class="profile-field">
+                                <label for="profileDescription">Racconta alla community che tipo di matcher sei!</label>
+                                <textarea 
+                                    id="profileDescription" 
+                                    maxlength="120" 
+                                    placeholder="Es: Amante della musica elettronica, sempre pronto per nuove avventure notturne! 🎵✨"
+                                    rows="3"
+                                ></textarea>
+                                <div class="char-counter">
+                                    <span id="charCount">0</span>/120 caratteri
+                                </div>
+                            </div>
+                            
+                            <div class="profile-field">
+                                <label>I tuoi interessi (seleziona fino a 5)</label>
+                                <div class="interests-grid">
+                                    <span class="interest-tag" data-interest="techno">🎵 Techno</span>
+                                    <span class="interest-tag" data-interest="house">🏠 House</span>
+                                    <span class="interest-tag" data-interest="cocktails">🍸 Cocktail</span>
+                                    <span class="interest-tag" data-interest="rooftop">🏙️ Rooftop</span>
+                                    <span class="interest-tag" data-interest="live">🎤 Live Music</span>
+                                    <span class="interest-tag" data-interest="dancing">💃 Dancing</span>
+                                    <span class="interest-tag" data-interest="networking">🤝 Networking</span>
+                                    <span class="interest-tag" data-interest="aperitivo">🥂 Aperitivo</span>
+                                </div>
+                            </div>
+                            
+                            <div class="profile-actions">
+                                <button class="btn-secondary" onclick="dashboard.resetProfile()">
+                                    Ripristina
+                                </button>
+                                <button class="btn-primary" onclick="dashboard.saveProfile()">
+                                    💾 Salva Profilo
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

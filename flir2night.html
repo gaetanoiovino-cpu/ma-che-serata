@@ -206,9 +206,13 @@
                     <div class="form-group">
                         <label class="file-upload-label">
                             📷 Aggiungi Foto (opzionale)
-                            <input type="file" accept="image/*" multiple style="display: none;">
+                            <input type="file" accept="image/*" multiple style="display: none;" id="photoInput">
                             <span class="file-upload-text">Trascina le foto qui o clicca per selezionare</span>
                         </label>
+                        <div class="photo-preview" id="photoPreview" style="display: none;">
+                            <div class="preview-images"></div>
+                            <small class="photo-info">Max 5 foto, 5MB ciascuna</small>
+                        </div>
                     </div>
                     
                     <div class="form-actions">
