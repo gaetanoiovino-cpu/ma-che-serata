@@ -1,0 +1,370 @@
+====== MA CHE SERATA - PROGETTO COMPLETO ======
+
+=== STEP 1: CREA QUESTI FILES SU GITHUB ===
+
+=== FILE: package.json ===
+{
+  "name": "ma-che-serata",
+  "version": "1.0.0",
+  "description": "🍸 Ma Che Serata - Nightlife & Events Platform",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'Static site - no build required'",
+    "start": "netlify dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.4",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.7",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.10.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["nightlife", "events", "booking", "community", "social"],
+  "author": "Ma Che Serata Team",
+  "license": "MIT"
+}
+
+=== FILE: netlify.toml ===
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[functions]
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+
+[dev]
+  functions = "netlify/functions"
+  port = 8888
+
+=== FILE: index.html ===
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍸 Ma Che Serata - Nightlife & Events Platform</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍸</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="flir2night.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-icon">🍸</span>
+                <span class="logo-text">Ma Che Serata</span>
+            </div>
+            <div class="nav-links">
+                <a href="#eventi" class="nav-link">Eventi</a>
+                <a href="#locali" class="nav-link">Locali</a>
+                <a href="flir2night.html" class="nav-link">Flir2night</a>
+                <button class="btn-login" onclick="showLoginModal()">Accedi</button>
+                <button class="btn-register" onclick="showRegisterModal()">Registrati</button>
+            </div>
+            <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    <span class="title-emoji">🍸</span>
+                    Ma Che Serata
+                </h1>
+                <p class="hero-subtitle">La piattaforma definitiva per scoprire eventi nella vita notturna italiana</p>
+                <div class="hero-features">
+                    <span class="feature-badge">🎭 Eventi Esclusivi</span>
+                    <span class="feature-badge">👫 Prenota Insieme</span>
+                    <span class="feature-badge">💬 Flir2night Community</span>
+                </div>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="showRegisterModal()">
+                        <span>Unisciti Ora</span>
+                        <span class="btn-icon">✨</span>
+                    </button>
+                    <button class="btn-secondary" onclick="scrollToSection('eventi')">
+                        <span>Scopri Eventi</span>
+                        <span class="btn-icon">🎪</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="floating-elements">
+            <div class="floating-element">🍸</div>
+            <div class="floating-element">🎭</div>
+            <div class="floating-element">🌟</div>
+            <div class="floating-element">💫</div>
+            <div class="floating-element">🎪</div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">✨ Caratteristiche Uniche</h2>
+                <p class="section-subtitle">Tutto quello che serve per vivere la vita notturna al massimo</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎭</div>
+                    <h3>Eventi Esclusivi</h3>
+                    <p>Accedi a eventi privati e serate esclusive in tutta Italia</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👫</div>
+                    <h3>Prenota Insieme</h3>
+                    <p>Trova persone con cui condividere le tue serate preferite</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👻</div>
+                    <h3>Evento Fantasma</h3>
+                    <p>Eventi misteriosi con location rivelata all'ultimo momento</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Flir2night Community</h3>
+                    <p>Forum sociale per condividere esperienze e consigli</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎵</div>
+                    <h3>Playlist Evento</h3>
+                    <p>Ogni evento ha la sua colonna sonora personalizzata</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⭐</div>
+                    <h3>Sistema Cheers</h3>
+                    <p>Guadagna punti e sblocca vantaggi esclusivi</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events Section -->
+    <section class="events-section" id="eventi">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">🎭 Eventi in Evidenza</h2>
+                <p class="section-subtitle">Le serate più hot del momento ti aspettano</p>
+            </div>
+
+            <div class="events-grid" id="eventsGrid">
+                <div class="event-card">
+                    <div class="event-image">
+                        <div class="event-category">🎵 Electronic</div>
+                        <div class="event-date">
+                            <div class="date-day">25</div>
+                            <div class="date-month">GEN</div>
+                        </div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Notte Magica al Duomo</h3>
+                        <div class="event-details">
+                            <span class="event-location">📍 Terrazza Duomo Milano</span>
+                            <span class="event-time">🕙 22:00 - 04:00</span>
+                            <span class="event-price">💶 25€</span>
+                        </div>
+                        <div class="event-description">
+                            Una serata indimenticabile nel cuore di Milano con vista mozzafiato sulla città
+                        </div>
+                        <div class="event-tags">
+                            <span class="tag">🎧 Techno</span>
+                            <span class="tag">🏙️ Rooftop</span>
+                            <span class="tag">🥂 Premium</span>
+                        </div>
+                        <div class="event-group-info">
+                            <div class="group-members">
+                                <div class="members-avatars">
+                                    <span class="member-avatar">👤</span>
+                                    <span class="member-avatar">👩</span>
+                                    <span class="member-count">+3</span>
+                                </div>
+                                <span class="group-text">5 persone interessate</span>
+                            </div>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn-primary" onclick="bookEvent('duomo-night')">
+                                🎫 Prenota Solo
+                            </button>
+                            <button class="btn-secondary book-together-btn" onclick="bookTogether('duomo-night')">
+                                👫 Prenota Insieme
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <span class="logo-icon">🍸</span>
+                        <span class="logo-text">Ma Che Serata</span>
+                    </div>
+                    <p class="footer-description">La piattaforma definitiva per la vita notturna italiana</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Platform</h4>
+                    <ul class="footer-links">
+                        <li><a href="#eventi">Eventi</a></li>
+                        <li><a href="#locali">Locali</a></li>
+                        <li><a href="flir2night.html">Flir2night</a></li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Ma Che Serata. Made with ❤️ in Italy</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🍸 Accedi</h2>
+                <span class="close" onclick="hideLoginModal()">&times;</span>
+            </div>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn-primary btn-full" id="loginBtn">
+                    <span class="btn-text">Accedi</span>
+                    <span class="btn-loader" style="display: none;">🔄</span>
+                </button>
+            </form>
+            <div class="auth-footer">
+                <p>Non hai un account? <a href="#" onclick="switchToRegister()">Registrati</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🚀 Unisciti alla community</h2>
+                <span class="close" onclick="hideRegisterModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerUsername">Username</label>
+                        <input type="text" id="registerUsername" name="username" placeholder="Il tuo username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" name="email" placeholder="La tua email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <div class="password-input-group">
+                            <input type="password" id="registerPassword" name="password" placeholder="Crea una password" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility(event)">👁️</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Conferma Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Ripeti la password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userType">Che tipo di utente sei?</label>
+                        <select id="userType" name="userType" required>
+                            <option value="">Seleziona il tuo ruolo</option>
+                            <option value="matcher">🎭 Matcher - Voglio partecipare agli eventi (Accesso immediato)</option>
+                            <option value="pr">📢 PR/Promoter - Promuovo eventi e locali (Validazione richiesta)</option>
+                            <option value="manager">🍸 Gestore Locale - Gestisco un locale/venue (Validazione richiesta)</option>
+                            <option value="artist">🎵 Artista - Sono un DJ/performer (Validazione richiesta)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="acceptTerms" id="acceptTerms" required>
+                            <span class="checkmark"></span>
+                            Accetto i <a href="#" target="_blank">Termini di Servizio</a> e la <a href="#" target="_blank">Privacy Policy</a>
+                        </label>
+                    </div>
+                    <div class="error-message" id="registerError"></div>
+                    <button type="submit" class="btn-primary" id="registerBtn">Registrati</button>
+                </form>
+                <div class="modal-footer">
+                    <p>Hai già un account? <a href="#" onclick="switchToLogin()">Accedi qui</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/dashboard-router.js"></script>
+    <script src="js/gamification.js"></script>
+    <script src="js/i18n.js"></script>
+    <script src="js/feedback-system.js"></script>
+    <script src="js/push-notifications.js"></script>
+    <script src="js/gdpr-compliance.js"></script>
+    <script src="js/flir2night.js"></script>
+</body>
+</html>
+
+=== CONTINUA NEL PROSSIMO FILE... ===
